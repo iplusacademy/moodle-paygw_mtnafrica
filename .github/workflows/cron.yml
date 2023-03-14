@@ -1,38 +1,20 @@
-name: Tests
+name: Cron
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: "5 10 9 * *"
 
 jobs:
   ci:
     name: ci
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: 'postgres'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
-        options: --health-cmd="pg_isready" --health-interval 10s --health-timeout 5s --health-retries 5
-        ports:
-          - 5432:5432
-      mariadb:
-        image: mariadb:10
-        env:
-          MYSQL_USER: 'root'
-          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
-          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
-        ports:
-          - 3306:3306
-
     strategy:
       fail-fast: false
       matrix:
         moodle-branch: ['MOODLE_401_STABLE']
         php: ['8.0']
-        database: ['mariadb', 'pgsql']
+        database: ['mysqli']
 
     steps:
       - name: checkout plugin
@@ -51,9 +33,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, pgsql, mysqli, gd, xmlrpc, zip
+          extensions: mbstring, mysqli, gd, zip
           ini-values: max_input_vars=5000
           coverage: xdebug
+
+      - name: cache composer
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache/
+          key: composer-cache
 
       - name: composer
         run: |
@@ -61,9 +49,11 @@ jobs:
            echo $(cd ci/bin; pwd) >> $GITHUB_PATH
            echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
            sudo locale-gen en_AU.UTF-8
+           sudo systemctl start mysql.service
+           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: install Moodle
-        run: moodle-plugin-ci --ansi install --db-host=127.0.0.1 --plugin this-plugin --extra-plugins=extras
+        run: moodle-plugin-ci install --db-user=root --db-pass=root --db-host=127.0.0.1 --plugin this-plugin --extra-plugins=extras
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
@@ -86,7 +76,7 @@ jobs:
 
       - name: codechecker
         if: ${{ always() }}
-        run: moodle-plugin-ci --ansi codechecker --max-warnings 0
+        run: moodle-plugin-ci --ansi codechecker
 
       - name: validate
         if: ${{ always() }}
@@ -97,7 +87,6 @@ jobs:
         run: moodle-plugin-ci --ansi savepoints
 
       - name: grunt
-        continue-on-error: true
         if: ${{ always() }}
         run: moodle-plugin-ci --ansi grunt
 
@@ -107,35 +96,19 @@ jobs:
 
       - name: phpunit
         if: ${{ always() }}
-        env:
-            login: ${{ secrets.login }}
-            secret: ${{ secrets.secret }}
-            secret1: ${{ secrets.secret1 }}
         run: moodle-plugin-ci --ansi phpunit --coverage-text --coverage-clover
 
-      - name: coveralls
+      - name: behat
         if: ${{ always() }}
-        run: moodle-plugin-ci coveralls-upload
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: moodle-plugin-ci --ansi behat --profile=chrome
 
       - name: privacy
         if: ${{ always() }}
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: firefox
+      - name: coveralls
         if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat
-      
-      - name: chrome
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --profile chrome
-
-      - name: firefox classic
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic
-      
-      - name: chrome classic
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic --profile=chrome
+        run: moodle-plugin-ci coveralls-upload
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}

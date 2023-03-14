@@ -108,9 +108,6 @@ class transaction_complete extends external_api {
                 $suc = $DB->insert_record('paygw_mtnafrica', $record);
                 $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
             }
-        } else {
-            // TODO: Why is the config not found?
-            mtrace($itemid);
         }
         return ['success' => $suc, 'message' => $result['status']];
     }
