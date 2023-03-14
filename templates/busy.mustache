@@ -1,0 +1,67 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template paygw_mtnafrica/mtn_busy
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {}
+
+}}
+<div id="mtn-image" class="bg-grey mb-4 w-100 text-center">
+    <img src="/payment/gateway/mtnafrica/pix/img.png" title="{{#str}} plugin, paygw_mtnafrica {{/str}}" alt="{{#str}} plugin, paygw_mtnafrica {{/str}}">
+</div>
+<div class="mb-4 w-100 text-center font-italic">{{#str}} mtnstart, paygw_mtnafrica {{/str}}</div>
+<div id="mtn-spinner" class="text-center mb-4 w-100 row">
+    <span style="margin: auto;">{{#pix}} i/ajaxloader, core, Working {{/pix}}</span>
+</div>
+<div class="text-center">
+    <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="mtn-pay" class="mtn-pay btn btn-primary" data-for="enablepay" disabled>
+    <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="mtn-cancel" class="mtn-pay btn btn-secondary" data-for="enablepay">
+</div>
+<div id="mtn-progress" class="mt-4 mb-4 w-100 row">
+    <div class="text-center w-100">
+        <p id="mtn-progress_status" class="text-xs-center"></p>
+        <progress id="mtn-progress_bar" class="progress progress-striped progress-animated w-75" style="margin: auto auto;" value="0" max="100"></progress>
+        <p id="mtn-progress_estimate" class="text-xs-center"></p>
+    </div>
+</div>
+<div id="mtn-out" class="bg-grey rounded mt-4 mb-4 w-100 text-center"></div>

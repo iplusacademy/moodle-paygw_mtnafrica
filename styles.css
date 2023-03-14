@@ -1,0 +1,16 @@
+.core_payment_gateways_modal .mtnafrica .icon {
+    height: 80px;
+    width: auto;
+}
+#mobile_money_body div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#mobile_money_body,
+#mobile_money_body p,
+#mobile_money_body a img {
+    justify-content: center;
+    text-align: center;
+}
+
