@@ -28,10 +28,6 @@ namespace paygw_mtnafrica;
 use curl;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
-
-
 /**
  * Contains helper class to work with MTN Africa REST API.
  *

@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023022701;
-$plugin->requires = 2022041200;
+$plugin->version = 2023031900;
+$plugin->requires = 2023031800;
 $plugin->component = 'paygw_mtnafrica';
-$plugin->release = 'v4.0.0';
+$plugin->release = 'v4.2.1';
 $plugin->maturity = MATURITY_RC;
-$plugin->supported = [401, 401];
+$plugin->supported = [402, 402];

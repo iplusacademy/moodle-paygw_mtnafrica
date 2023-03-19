@@ -40,11 +40,6 @@ To set up access within Moodle you will need to:
 * Make a phone call to your local MTN representative so your submitted resquest is accepted, yes, somebody at MTN Africa needs to turn a switch before your changes take effect.
 * For every change, callback url, enable extra APIs, ... see previous line. 
 
-## Dependencies
-
-* Currently this plugin is using the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
-* From Moodle_402_STABLE on this will not be necessary any more as Guzzle will be part of Moodle.
-
 ## Configure Moodle
 
 * Go to site administration / Plugins / Manage payment gateways and enable the MTN payment gateway.
