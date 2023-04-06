@@ -41,9 +41,9 @@ class gateway extends \core_payment\gateway {
      * @return array
      */
     public static function get_country_currencies(): array {
-        // Not yet supported by Moodle: ZMW MDL-77584.
         return ['BJ' => 'XOF', 'CM' => 'XAF', 'TD' => 'XAF', 'CG' => 'XAF', 'CD' => 'CDF', 'GH' => 'GHS', 'GN' => 'GNF',
-                'CI' => 'XOF', 'LR' => 'LRD', 'NE' => 'XOF', 'RW' => 'RWF', 'ZA' => 'ZAR', 'UG' => 'UGX', 'sandbox' => 'EUR'];
+                'CI' => 'XOF', 'LR' => 'LRD', 'NE' => 'XOF', 'RW' => 'RWF', 'ZA' => 'ZAR', 'UG' => 'UGX', 'ZM' => 'ZMW',
+                'sandbox' => 'EUR'];
     }
 
     /**
@@ -52,8 +52,7 @@ class gateway extends \core_payment\gateway {
      * @return array
      */
     public static function get_supported_currencies(): array {
-        // Not yet supported by Moodle: ZMW MDL-77584.
-        return ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR'];
+        return ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR', 'ZMW'];
     }
 
     /**
@@ -62,7 +61,7 @@ class gateway extends \core_payment\gateway {
      * @return array
      */
     public static function get_countries(): array {
-        return ['BJ', 'CM', 'TD', 'CG', 'CD', 'GA', 'GH', 'CI', 'LR', 'NE', 'RW', 'ZA', 'UG'];
+        return ['BJ', 'CM', 'TD', 'CG', 'CD', 'GA', 'GH', 'CI', 'LR', 'NE', 'RW', 'ZA', 'UG', 'ZM'];
     }
 
     /**
