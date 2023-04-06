@@ -95,6 +95,11 @@ Please contact you MTN Africa representative in case you get invalid transaction
 - Please create pull requests on [Github](https://github.com/iplusacademy/moodle-paygw_mtnafrica/pulls)
 - We are always interested to read about your feature proposals or even get a pull request from you, but please accept that we can handle your issues only as feature proposals and not as feature requests.
 
+## Status
+
+[![Build Status](https://github.com/iplusacademy/moodle-paygw_mtnafrica/actions/workflows/main.yml/badge.svg)](https://github.com/iplusacademy/moodle-paygw_mtnafrica/actions)
+
+
 ## License
 
 2023 Medical Access Uganda

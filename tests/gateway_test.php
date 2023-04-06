@@ -53,9 +53,9 @@ class gateway_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\gateway
      */
     public function test_gateway() {
-        $this->assertCount(10, gateway::get_supported_currencies());
-        $this->assertCount(14, gateway::get_country_currencies());
-        $this->assertCount(13, gateway::get_countries());
+        $this->assertCount(11, gateway::get_supported_currencies());
+        $this->assertCount(15, gateway::get_country_currencies());
+        $this->assertCount(14, gateway::get_countries());
         $errors = [];
         $gateway = $this->account->get_gateways()['mtnafrica'];
         $form = new \core_payment\form\account_gateway('', ['persistent' => $gateway]);
