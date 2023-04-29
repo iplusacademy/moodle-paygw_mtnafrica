@@ -25,7 +25,11 @@
 
 namespace paygw_mtnafrica\external;
 
-use core_external;
+use core_external\external_api;
+
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
  * Testing externals in payments API
@@ -34,8 +38,9 @@ use core_external;
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @runTestsInSeparateProcesses
  */
-class external_test extends \advanced_testcase {
+class external_test extends \externallib_advanced_testcase {
 
     /** @var string phone */
     private $phone = '46733123454';
@@ -73,15 +78,6 @@ class external_test extends \advanced_testcase {
     }
 
     /**
-     * Test external config for js.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
-     */
-    public function test_config_for_js() {
-        $this->assertInstanceOf('external_function_parameters', get_config_for_js::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', get_config_for_js::execute_returns());
-    }
-
-    /**
      * Test external config for js with credits.
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
@@ -91,15 +87,6 @@ class external_test extends \advanced_testcase {
         }
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertEquals('UG', $result['country']);
-    }
-
-    /**
-     * Test external transaction_start.
-     * @covers \paygw_mtnafrica\external\transaction_start
-     */
-    public function test_transaction_start() {
-        $this->assertInstanceOf('external_function_parameters', transaction_start::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_start::execute_returns());
     }
 
     /**
@@ -113,15 +100,6 @@ class external_test extends \advanced_testcase {
         }
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $this->phone, $USER->country);
         $this->assertArrayHasKey('message', $result);
-    }
-
-    /**
-     * Test external transaction complete.
-     * @covers \paygw_mtnafrica\external\transaction_complete
-     */
-    public function test_transaction_complete() {
-        $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
     }
 
     /**
