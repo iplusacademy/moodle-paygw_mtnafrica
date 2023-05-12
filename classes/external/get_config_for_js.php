@@ -84,6 +84,7 @@ class get_config_for_js extends external_api {
             $userid = $user->id;
             $country = strtoupper($user->country);
             $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
+            $phone = preg_replace("/[^0-9]/", '', $phone);
         }
         $config = (object)helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
         $payable = helper::get_payable($component, $paymentarea, $itemid);
