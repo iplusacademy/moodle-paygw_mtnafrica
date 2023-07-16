@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * paygw_mtnafrica installer script.
+ * Clean up task for the MTN payment gateway plugin.
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,14 +23,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Installer script.
- *
- */
-function xmldb_paygw_mtnafrica_install() {
-    global $CFG;
+namespace paygw_mtnafrica\task;
 
-    // Enable the mtn payment gateway on installation. It still needs to be configured and enabled for accounts.
-    $order = (!empty($CFG->paygw_plugins_sortorder)) ? explode(',', $CFG->paygw_plugins_sortorder) : [];
-    set_config('paygw_plugins_sortorder', join(',', array_merge($order, ['mtnafrica'])));
+/**
+ * Payment MTN clean up task.
+ *
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class clean_up extends \core\task\scheduled_task {
+
+    /**
+     * Name for this task.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('cleanuptask', 'paygw_mtnafrica');
+    }
+
+    /**
+     * Run task for cleaning up payments.
+     */
+    public function execute() {
+        global $DB;
+        $DB->delete_records_select('paygw_mtnafrica', 'timecompleted = :cond', ['cond' => null]);
+    }
 }
+

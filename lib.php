@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * paygw_mtnafrica installer script.
+ * Library file.
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -24,13 +24,10 @@
  */
 
 /**
- * Installer script.
+ * Security check.
  *
+ * @return array
  */
-function xmldb_paygw_mtnafrica_install() {
-    global $CFG;
-
-    // Enable the mtn payment gateway on installation. It still needs to be configured and enabled for accounts.
-    $order = (!empty($CFG->paygw_plugins_sortorder)) ? explode(',', $CFG->paygw_plugins_sortorder) : [];
-    set_config('paygw_plugins_sortorder', join(',', array_merge($order, ['mtnafrica'])));
+function paygw_mtnafrica_security_checks(): array {
+    return [new \paygw_mtnafrica\check\mtnafrica()];
 }

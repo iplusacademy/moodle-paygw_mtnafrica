@@ -43,19 +43,40 @@
     * none
 
     Example context (json):
-    {}
+    {
+        "sesskey": "sesskey",
+        "phone": "666666666",
+        "country": "UG",
+        "component": "enrol_fee",
+        "paymentarea": "fee",
+        "transactionid": "999999999",
+        "itemid": "8",
+        "description": "description",
+        "reference": "reference"
+    }
 
 }}
 <div id="mtn-image" class="bg-grey mb-4 w-100 text-center">
-    <img src="/payment/gateway/mtnafrica/pix/img.png" title="{{#str}} plugin, paygw_mtnafrica {{/str}}" alt="{{#str}} plugin, paygw_mtnafrica {{/str}}">
+    <img src="/payment/gateway/mtnafrica/pix/img.png" title="{{#str}} pluginname, paygw_mtnafrica {{/str}}" alt="{{#str}} pluginname, paygw_mtnafrica {{/str}}">
 </div>
 <div class="mb-4 w-100 text-center font-italic">{{#str}} mtnstart, paygw_mtnafrica {{/str}}</div>
 <div id="mtn-spinner" class="text-center mb-4 w-100 row">
     <span style="margin: auto;">{{#pix}} i/ajaxloader, core, Working {{/pix}}</span>
 </div>
 <div class="text-center">
-    <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="mtn-pay" class="mtn-pay btn btn-primary" data-for="enablepay" disabled>
-    <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="mtn-cancel" class="mtn-pay btn btn-secondary" data-for="enablepay">
+    <form id="mtn-form" action="/payment/gateway/mtnafrica/continue.php" method="post">
+        <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="mtn-pay" class="mtn-pay btn btn-primary" data-for="enablepay">
+        <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="mtn-cancel" class="mtn-pay btn btn-secondary" data-for="enablepay">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="phone" value="{{phone}}">
+        <input type="hidden" name="country" value="{{country}}">
+        <input type="hidden" name="component" value="{{component}}">
+        <input type="hidden" name="paymentarea" value="{{paymentarea}}">
+        <input type="hidden" name="itemid" value="{{itemid}}">
+        <input type="hidden" name="transactionid" value="{{transactionid}}">
+        <input type="hidden" name="description" value="{{description}}">
+        <input type="hidden" name="reference" value="{{reference}}">
+    </form>
 </div>
 <div id="mtn-progress" class="mt-4 mb-4 w-100 row">
     <div class="text-center w-100">

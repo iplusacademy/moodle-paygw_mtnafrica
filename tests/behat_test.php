@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * paygw_mtnafrica installer script.
+ * Testing callback in MTN Africa payments API
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,14 +23,33 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Installer script.
- *
- */
-function xmldb_paygw_mtnafrica_install() {
-    global $CFG;
+namespace paygw_mtnafrica;
 
-    // Enable the mtn payment gateway on installation. It still needs to be configured and enabled for accounts.
-    $order = (!empty($CFG->paygw_plugins_sortorder)) ? explode(',', $CFG->paygw_plugins_sortorder) : [];
-    set_config('paygw_plugins_sortorder', join(',', array_merge($order, ['mtnafrica'])));
+/**
+ * Testing callback in MTN Africa payments API
+ *
+ * @package    paygw_mtnafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class behat_test extends \advanced_testcase {
+
+    /**
+     * Setup function.
+     */
+    protected function setUp(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/payment/gateway/mtnafrica/tests/behat/behat_paygw_mtnafrica.php');
+        $this->resetAfterTest(true);
+    }
+
+    /**
+     * Test callback.
+     * @covers \behat_paygw_mtnafrica
+     */
+    public function test_behat() {
+        $behat = new \behat_paygw_mtnafrica();
+        $behat->i_configure_mtn();
+    }
 }

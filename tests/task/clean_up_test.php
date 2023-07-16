@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Testing externals in payments API
+ * Testing cleanup
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,31 +23,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace paygw_mtnafrica\external;
-
-use core_external\external_api;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+namespace paygw_mtnafrica\task;
 
 /**
- * Testing externals in payments API
+ * Testing cleanup
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @runTestsInSeparateProcesses
  */
-class get_config_for_js_test extends \externallib_advanced_testcase {
+class clean_up_test extends \advanced_testcase {
 
     /**
-     * Test external config for js.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
+     * Test clean up.
+     * @covers \paygw_mtnafrica\task\clean_up
      */
-    public function test_config_for_js() {
-        $this->assertInstanceOf('external_function_parameters', get_config_for_js::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', get_config_for_js::execute_returns());
+    public function test_clean_up() {
+        $this->resetAfterTest();
+        $task = new \paygw_mtnafrica\task\clean_up();
+        $task->get_name();
+        $task->execute();
     }
 }

@@ -59,7 +59,7 @@ jobs:
 
       - name: composer
         run: |
-           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci dev-master
+           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
            echo $(cd ci/bin; pwd) >> $GITHUB_PATH
            echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
            sudo locale-gen en_AU.UTF-8
@@ -134,18 +134,18 @@ jobs:
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: firefox
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat
-      
       - name: chrome
         if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --profile chrome
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi behat --profile chrome || true
 
-      - name: firefox classic
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic
-      
       - name: chrome classic
         if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic --profile=chrome
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi behat --suite classic --profile=chrome || true

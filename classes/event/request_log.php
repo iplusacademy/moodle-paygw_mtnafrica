@@ -26,7 +26,7 @@
 namespace paygw_mtnafrica\event;
 
 /**
- * This event is triggered whenever a failed http request occurs
+ * This event is triggered whenever a https request occurs
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda

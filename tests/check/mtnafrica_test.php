@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Testing externals in payments API
+ * Testing security checks
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,31 +23,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace paygw_mtnafrica\external;
-
-use core_external\external_api;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+namespace paygw_mtnafrica\check;
 
 /**
- * Testing externals in payments API
+ * Testing security checks
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @runTestsInSeparateProcesses
  */
-class transaction_start_test extends \externallib_advanced_testcase {
+class mtnafrica_test extends \advanced_testcase {
 
     /**
-     * Test transaction start.
-     * @covers \paygw_mtnafrica\external\transaction_start
+     * Test checks.
+     * @covers \paygw_mtnafrica\check\mtnafrica
      */
-    public function test_transaction_start() {
-        transaction_start::execute_parameters();
-        transaction_start::execute_returns();
+    public function test_checks() {
+        global $CFG;
+        require_once($CFG->dirroot . '/payment/gateway/mtnafrica/lib.php');
+        $checks = paygw_mtnafrica_security_checks();
+        $this->assertCount(1, $checks);
+        $check = new \paygw_mtnafrica\check\mtnafrica();
+        $this->assertEquals('warning', $check->get_result()->get_status());
+        $this->assertEmpty($check->get_action_link());
     }
 }

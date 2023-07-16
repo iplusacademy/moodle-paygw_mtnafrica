@@ -40,6 +40,11 @@ To set up access within Moodle you will need to:
 * Make a phone call to your local MTN representative so your submitted resquest is accepted, yes, somebody at MTN Africa needs to turn a switch before your changes take effect.
 * For every change, callback url, enable extra APIs, ... see previous line. 
 
+## Dependencies
+
+* Currently this plugin is using the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
+* From Moodle_402_STABLE on this will not be necessary any more as Guzzle will be part of Moodle.
+
 ## Configure Moodle
 
 * Go to site administration / Plugins / Manage payment gateways and enable the MTN payment gateway.
@@ -73,6 +78,24 @@ This plugin is developed and tested using
 * MariaDB
 * PostgreSQL
 
+## Testing
+
+The easiest way to test this plugin is to configure your sandbox environment with the keys provided from MTN.
+When you create a course and add a enrolment on fee with the cost of 40 EUR (the sandbox only accepts EURO).
+Next create a user with '46733123454' as telephone number and log in as this user.  When asked for a payment,
+you will be able to see the payment process completely, and after some waiting be automatically enrolled in the course.
+
+This plugin can also be tested in PHPUnit and Behat, but you need to add your login - secret - secret1 keys as an environment variable.
+
+* env login=???? secret=???? secret1=???? vendor/bin/phpunit --coverage-text payment/gateway/airtelafrica/
+* env login=???? secret=???? secret1=???? vendor/bin/behat --tags='paygw_airtelafrica'
+
+Or you can use secrets in Github actions:
+
+* gh secret set login -b"?????"
+* gh secret set secret -b"?????"
+* gh secret set secret1 -b"?????"
+
 ## Plugin repositories
 
 This plugin will be published and regularly updated on [Github](https://github.com/iplusacademy/moodle-paygw_mtnafrica)
@@ -93,7 +116,7 @@ Please contact you MTN Africa representative in case you get invalid transaction
 ## Status
 
 [![Build Status](https://github.com/iplusacademy/moodle-paygw_mtnafrica/actions/workflows/main.yml/badge.svg)](https://github.com/iplusacademy/moodle-paygw_mtnafrica/actions)
-
+[![Coverage Status](https://coveralls.io/repos/github/iplusacademy/moodle-paygw_mtnafrica/badge.svg)](https://coveralls.io/github/iplusacademy/moodle-paygw_mtnafrica)
 
 ## License
 

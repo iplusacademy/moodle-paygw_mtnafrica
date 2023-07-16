@@ -15,39 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Testing externals in payments API
+ * Clean up task for the MTN payment gateway plugin.
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace paygw_mtnafrica\external;
-
-use core_external\external_api;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
-/**
- * Testing externals in payments API
- *
- * @package    paygw_mtnafrica
- * @copyright  2023 Medical Access Uganda
- * @author     Renaat Debleu <info@eWallah.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @runTestsInSeparateProcesses
- */
-class transaction_complete_test extends \externallib_advanced_testcase {
-
-    /**
-     * Test transaction complete.
-     * @covers \paygw_mtnafrica\external\transaction_complete
-     */
-    public function test_transaction_complete() {
-        transaction_complete::execute_parameters();
-        transaction_complete::execute_returns();
-    }
-}
+$tasks = [[
+    'classname' => '\paygw_mtnafrica\task\clean_up',
+    'blocking' => 0,
+    'minute' => '44',
+    'hour' => '02',
+    'day' => '*',
+    'month' => '*',
+    'dayofweek' => '*',
+    'disabled' => 0]];

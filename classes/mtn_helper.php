@@ -27,6 +27,8 @@ namespace paygw_mtnafrica;
 
 use curl;
 use stdClass;
+use core_payment\helper;
+use core_text;
 
 /**
  * Contains helper class to work with MTN Africa REST API.
@@ -41,17 +43,12 @@ class mtn_helper {
     /**
      * @var string The base API URL
      */
-    public $baseurl;
-
-    /**
-     * @var string The callback URL
-     */
-    public $callbackurl;
+    public string $baseurl = 'https://api.mtn.com/';
 
     /**
      * @var bool Are we working in sandbox
      */
-    private $sandbox;
+    public bool $sandbox;
 
     /**
      * @var string Client ID
@@ -59,19 +56,14 @@ class mtn_helper {
     public $clientid;
 
     /**
-     * @var string MTN Africa App Ocp-Apim
-     */
-    private $ocpapim;
-
-    /**
-     * @var string MTN Africa Apikey
-     */
-    private $apikey;
-
-    /**
      * @var string MTN Africa Apikey
      */
     private $secret;
+
+    /**
+     * @var string MTN Africa Apikey2
+     */
+    private $secret1;
 
     /**
      * @var string The country where MTN Africa client is located
@@ -81,12 +73,12 @@ class mtn_helper {
     /**
      * @var string The oath bearer token
      */
-    public $token;
+    public $token = '';
 
     /**
      * @var boolean testing
      */
-    public $testing;
+    public $testing = false;
 
     /**
      * @var \GuzzleHttp\Client
@@ -95,49 +87,35 @@ class mtn_helper {
 
 
     /**
-     * helper constructor.
+     * Helper constructor.
      *
-     * @param string $clientid The client id.
-     * @param string $ocpapim MTN Africa ocpapim.
-     * @param string $secret MTN Africa secundary key.
+     * @param array $config The gateway configuration.
      * @param string $country MTN Africa location.
-     * @param string $sandbox Whether we are working with the sandbox environment or not.
-     * @param string $token If we alrady have a token, no need to generate a new one.
      */
-    public function __construct(string $clientid, string $ocpapim, string $secret,
-                                string $country = 'UG', string $sandbox = 'sandbox', string $token = '') {
-
+    public function __construct(array $config, string $country = 'UG') {
         $this->guzzle = new \GuzzleHttp\Client();
-        $this->sandbox = (bool)($sandbox == 'sandbox');
-        $this->token = $token;
-        $this->clientid = $clientid;
-        $this->ocpapim = $ocpapim;
-        $this->secret = $secret;
-        $this->baseurl = self::get_base_url($sandbox);
-        $this->callbackurl = self::get_callback_url($sandbox);
-        $this->country = $country;
-        $this->apikey = '';
-        $this->testing = ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING'));
-        if ($sandbox || $this->testing) {
-            // We need to create a user in this sandbox environment.
-            // We invent a clientid.
+        $this->sandbox = (strtolower($config['environment']) == 'sandbox');
+        if ($this->sandbox) {
             $this->clientid = self::gen_uuid4();
-
-            if ($clientid != 'fakelogin') {
-                // We create a new user.
-                $headers = ['X-Reference-Id' => $this->clientid, 'Ocp-Apim-Subscription-Key' => $this->ocpapim];
-                $data = ['providerCallbackHost' => $this->callbackurl];
-                $this->request_post('v1_0/apiuser', $data, $headers);
-
-                // We try to collect user information.
-                $headers = ['Ocp-Apim-Subscription-Key' => $this->ocpapim];
-                $this->request_post('v1_0/apiuser/' . $this->clientid, [], $headers, 'GET');
-
-                // We collect a apikey.
-                $result = $this->request_post('v1_0/apiuser/' . $this->clientid . '/apikey', [], $headers);
-                $this->apikey = array_key_exists('apiKey', $result) ? $result['apiKey'] : '';
-            }
+            $this->secret1 = $config['secret1sb'];
+            $this->baseurl = 'https://sandbox.momodeveloper.mtn.com/';
+            // We try to create a new user.
+            $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
+            $headers = ['X-Reference-Id' => $this->clientid, 'Ocp-Apim-Subscription-Key' => $this->secret1];
+            $data = ['providerCallbackHost' => $this->get_callback_host()];
+            $this->request_post('v1_0/apiuser', $data, $headers);
+            // We try to collect user information.
+            $headers = ['Ocp-Apim-Subscription-Key' => $this->secret1];
+            $this->request_post('v1_0/apiuser/' . $this->clientid, [], $headers, 'GET');
+            // We collect a apikey.
+            $result = $this->request_post('v1_0/apiuser/' . $this->clientid . '/apikey', [], $headers);
+            $this->secret = self::array_helper('apiKey', $result) ?? $this->secret;
+        } else {
+            $this->clientid = $config['clientid'];
+            $this->secret = $config['secret'];
+            $this->secret1 = $config['secretsb'];
         }
+        $this->country = self::array_helper('country', $config) ?? $country;
     }
 
     /**
@@ -145,30 +123,27 @@ class mtn_helper {
      *
      * @return string
      */
-    public static function gen_uuid4() {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+    private static function gen_uuid4() {
+        $magic = '%s%s-%s-%s-%s-%s%s%s';
+        $strong = vsprintf($magic, str_split(bin2hex(random_bytes(16)), 4));
+        $data = openssl_random_pseudo_bytes(16, $strong);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+        return vsprintf($magic, str_split(bin2hex($data), 4));
     }
 
     /**
-     * Which url should be used.
+     * Which host should be used for callback.
      *
-     * @param string $sandbox
      * @return string
      */
-    public static function get_base_url(string $sandbox = 'sandbox'): string {
-        return $sandbox == 'sandbox' ? 'https://sandbox.momodeveloper.mtn.com/' : 'https://api.mtn.com/';
-    }
-
-    /**
-     * Which url should be used.
-     *
-     * @param string $sandbox
-     * @return string
-     */
-    public static function get_callback_url(string $sandbox = 'sandbox'): string {
-        return $sandbox == 'sandbox' ? 'http://test.ewallah.net/payment/gateway/mtnafrica/callback.php' : '';
+    private function get_callback_host(): string {
+        global $CFG;
+        $dom = str_ireplace('http://', '', $CFG->wwwroot);
+        $dom = str_ireplace('https://', '', $dom);
+        $dom = str_ireplace('/moodle', '', $dom);
+        $dom = str_ireplace('www.example.com', 'test.ewallah.net', $dom);
+        return $this->sandbox ? 'http://' . $dom : 'https://' . $dom;
     }
 
     /**
@@ -179,7 +154,7 @@ class mtn_helper {
     private function get_token() {
         if ($this->token == '') {
             $result = $this->request_post('collection/token/', [], $this->get_basic_auth());
-            $this->token = array_key_exists('access_token', $result) ? (string) $result['access_token'] : '';
+            $this->token = self::array_helper('access_token', $result) ?? '';
         }
         return $this->token;
     }
@@ -201,8 +176,8 @@ class mtn_helper {
      */
     private function get_basic_auth(): array {
         return $this->add_xxx_protection([
-                'Ocp-Apim-Subscription-Key' => $this->ocpapim,
-                'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->apikey)]);
+            'Ocp-Apim-Subscription-Key' => $this->secret1,
+            'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->secret)]);
     }
 
     /**
@@ -214,10 +189,11 @@ class mtn_helper {
         $token = $this->get_token();
         return $this->add_xxx_protection([
             'Authorization' => 'Bearer ' . $token,
-            // TODO: INVALID_CALLBACK_URL_HOST error generated 'X-Callback-Url' => $this->callbackurl.
+            // TODO: INVALID_CALLBACK_URL_HOST error generated.
+            'X-Callback-Url' => $this->get_callback_host(),
             'X-Reference-Id' => $this->clientid,
             'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-            'Ocp-Apim-Subscription-Key' => $this->ocpapim]);
+            'Ocp-Apim-Subscription-Key' => $this->secret1]);
     }
 
     /**
@@ -233,25 +209,32 @@ class mtn_helper {
      */
     public function request_payment(
         int $transactionid, string $reference, float $amount, string $currency, string $userphone, string $usercountry): array {
+
         $allcountries = \paygw_mtnafrica\gateway::get_countries();
         $usercountry = strtoupper($usercountry);
+        $currency = $this->sandbox ? 'EUR' : $currency;
         if (in_array($usercountry, $allcountries)) {
-            $location = 'collection/v1_0/requesttopay';
+            $location = $this->baseurl . 'collection/v1_0/requesttopay';
             $xref = self::gen_uuid4();
             $headers = [
                 'Authorization' => 'Bearer ' . $this->get_token(),
                 'X-Reference-Id' => $xref,
                 'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-                'Ocp-Apim-Subscription-Key' => $this->ocpapim];
+                'Ocp-Apim-Subscription-Key' => $this->secret1];
             $data = [
                 'amount' => $amount,
                 'currency' => $currency,
                 'externalId' => $transactionid,
                 'payer' => ['partyIdType' => 'MSISDN', 'partyId' => $userphone],
-                'payerMessage' => $reference,
+                'payerMessage' => substr(get_string('thanks', 'paygw_mtnafrica'), 0, 30),
                 'payeeNote' => $reference];
-            $response = $this->guzzle->request('POST', $this->baseurl . $location, ['headers' => $headers, 'json' => $data]);
-            return ['code' => $response->getStatusCode(), 'xreferenceid' => $xref, 'token' => $this->token];
+            $response = $this->guzzle->request('POST', $location, ['headers' => $headers, 'json' => $data]);
+            $code = $response->getStatusCode();
+            $other = array_merge(['verb' => 'Post', 'location' => $location, 'answer' => $code], $data);
+            $eventargs = ['context' => \context_system::instance(), 'other' => $other];
+            $event = \paygw_mtnafrica\event\request_log::create($eventargs);
+            $event->trigger();
+            return ['code' => $code, 'xreferenceid' => $xref, 'token' => $this->token];
         }
         throw new \moodle_exception(get_string('invalidcountrycode', 'core_error', $usercountry));
     }
@@ -269,7 +252,7 @@ class mtn_helper {
         $headers = [
             'Authorization' => 'Bearer ' . $token,
             'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-            'Ocp-Apim-Subscription-Key' => $this->ocpapim];
+            'Ocp-Apim-Subscription-Key' => $this->secret1];
         return $this->request_post($location, [], $headers, 'GET');
     }
 
@@ -296,7 +279,9 @@ class mtn_helper {
      */
     private function request_post(
         string $location, array $data, array $headers = [], string $verb = 'POST'): ?array {
-        $decoded = $result = '';
+
+        global $CFG;
+        $decoded = $result = $resultcode = '';
         $response = null;
         $location = $this->baseurl . $location;
         $headers = array_merge(['Content-Type' => 'application/json'], $headers);
@@ -305,15 +290,109 @@ class mtn_helper {
             $result = $response->getBody()->getContents();
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $result = $e->getMessage();
+            mtrace_exception($e);
+        } catch (\Exception $e) {
+            $result = $e->getMessage();
+            mtrace_exception($e);
         } finally {
             $decoded = json_decode($result, true);
-            // Trigger an event.
-            $eventargs = ['context' => \context_system::instance(),
-                          'other' => ['verb' => $verb, 'location' => $location, 'result' => $decoded]];
-            $event = \paygw_mtnafrica\event\request_log::create($eventargs);
-            $event->trigger();
+            if ($CFG->debugdeveloper) {
+                $other = ['verb' => $verb, 'location' => $location];
+                $decolog = $decoded;
+                if (is_array($decolog)) {
+                    if (array_key_exists('access_token', $decolog)) {
+                        unset($decolog['access_token']);
+                    }
+                    $other['result'] = $decolog;
+                    // TODO: uncomment for tracing.
+                    // mtrace(json_encode($decolog));.
+                } else {
+                    $resultcode = $response->getStatusCode();
+                    $resultreason = $response->getReasonPhrase();
+                    $other['result'] = $resultcode . ' ' . $resultreason;
+                    // TODO: uncomment for tracing.
+                    // mtrace($resultcode);.
+                }
+                $eventargs = ['context' => \context_system::instance(), 'other' => $other];
+                // Trigger an event.
+                \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
+            }
         }
-        return $decoded;
+        return $decoded ?? [];
+    }
+
+    /**
+     * Enrol the user
+     *
+     * @param string $transactionid
+     * @param int $itemid
+     * @param string $component Name of the component that the itemid belongs to
+     * @param string $area The payment area
+     * @return string
+     */
+    public function enrol_user(string $transactionid, int $itemid, string $component, string $area): string {
+        global $DB;
+        // We assume the transaction pending.
+        $status = 'PENDING';
+        $cond = ['transactionid' => $transactionid, 'paymentid' => $itemid];
+        if ($rec = $DB->get_record('paygw_mtnafrica', $cond)) {
+            $userid = $rec->userid;
+            if ($rec->timecompleted == 0) {
+                $this->token = $rec->moneyid;
+                $result = $this->transaction_enquiry($transactionid, $this->token);
+
+                // Sample data:
+                // [financialTransactionId] => 2026118745
+                // [externalId] => 2362616710
+                // [amount] => 100
+                // [currency] => EUR
+                // [payer] => {[partyIdType] => MSISDN, [partyId] => 1234567}
+                // [payerMessage] => Thanks for your payment
+                // [payeeNote] => enrol_fee-fee-13-4
+                // [status] => SUCCESSFUL.
+
+                $status = self::array_helper('status', $result);
+                if ($status) {
+                    if ($status == 'FAILED') {
+                        $DB->delete_record('paygw_mtnafrica', $cond);
+                    }
+                    if ($status == 'SUCCESSFUL') {
+                        $payable = helper::get_payable($component, $area, $itemid);
+                        $payid = $payable->get_account_id();
+                        $currency = $this->sandbox ? 'EUR' : $payable->get_currency();
+                        $surcharge = helper::get_gateway_surcharge('mtnafrica');
+                        $amount = helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+                        $moneyid = self::array_helper('financialTransactionId', $result);
+                        $ramount = self::array_helper('amount', $result);
+                        $rcurrency = self::array_helper('currency', $result);
+                        $payer = self::array_helper('payeeNote', $result);
+                        if ($currency == $rcurrency && $amount == $ramount) {
+                            // We have a succesfull transaction.
+                            $payer = explode('-', $payer);
+                            if ($payer[0] == $component && $payer[1] == $area && intval($payer[3]) == $userid) {
+                                $saved = helper::save_payment(
+                                    $payid,
+                                    $component,
+                                    $area,
+                                    $itemid,
+                                    $userid,
+                                    $amount,
+                                    $currency,
+                                    'mtnafrica');
+                                helper::deliver_order($component, $area, $itemid, $saved, $userid);
+                                $DB->set_field('paygw_mtnafrica', 'timecompleted', time(), $cond);
+                                $DB->set_field('paygw_mtnafrica', 'moneyid', $moneyid, $cond);
+                            }
+                        } else {
+                            // Fraud?
+                            $DB->set_field('paygw_mtnafrica', 'area', 'FRAUD');
+                            $status = 'FAILED';
+                        }
+                    }
+                }
+            }
+        }
+        return $status;
     }
 
     /**
@@ -321,13 +400,13 @@ class mtn_helper {
      * @param int $code
      * @return string
      */
-    public function ta_code(int $code) {
+    public static function ta_code(int $code) {
         $returns = [
             202 => 'Accepted',
             400 => 'Bad Request',
             409 => 'Conflict, duplicated reference id',
             500 => 'Internal Server Error'];
-        return array_key_exists($code, $returns) ? $returns[$code] : 'Unknown';
+        return self::array_helper($code, $returns) ?? 'Unknown';
     }
 
     /**
@@ -335,7 +414,7 @@ class mtn_helper {
      * @param string $code
      * @return string tartet
      */
-    public function target_code(string $code) {
+    public static function target_code(string $code) {
         $returns = [
             'UG' => 'mtnuganda',
             'GH' => 'mtnghana',
@@ -348,6 +427,37 @@ class mtn_helper {
             'GN' => 'mtnguineaconakry',
             'ZA' => 'mtnsouthafrica',
             'LR' => 'mtnliberia'];
-        return array_key_exists($code, $returns) ? $returns[$code] : 'sandbox';
+        return self::array_helper($code, $returns) ?? 'sandbox';
+    }
+
+
+    /**
+     * Array helper.
+     *
+     * @param string $key
+     * @param array $arr
+     * @return array||null
+     */
+    public static function array_helper(string $key, array $arr) {
+        return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : null;
+    }
+
+    /**
+     * User data helper.
+     *
+     * @return array
+     */
+    public function current_user_data() {
+        global $USER;
+        $arr = [];
+        $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
+        if ($user) {
+            $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
+            $phone = preg_replace("/[^0-9]/", '', $phone);
+            if (strlen($phone) > 5) {
+                $arr = ['id' => $user->id, 'country' => strtoupper($user->country), 'phone' => $phone];
+            }
+        }
+        return $arr;
     }
 }

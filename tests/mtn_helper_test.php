@@ -25,6 +25,7 @@
 
 namespace paygw_mtnafrica;
 
+use paygw_mtnafrica\mtn_helper;
 /**
  * Testing generator in payments API
  *
@@ -35,17 +36,8 @@ namespace paygw_mtnafrica;
  */
 class mtn_helper_test extends \advanced_testcase {
 
-    /** @var string phone */
-    private $phone = '46733123454';
-
-    /** @var string login */
-    private $login;
-
-    /** @var string secret */
-    private $secret;
-
-    /** @var string secret */
-    private $secret1;
+    /** @var config configuration */
+    private $config;
 
     /**
      * Setup function.
@@ -54,18 +46,26 @@ class mtn_helper_test extends \advanced_testcase {
         global $DB;
         $this->resetAfterTest(true);
         set_config('country', 'UG');
-        $this->login = getenv('login') ? getenv('login') : 'fakelogin';
-        $this->secret = getenv('secret') ? getenv('secret') : 'fakesecret';
-        $this->secret1 = getenv('secret1') ? getenv('secret1') : 'fakesecret';
+        $secret = getenv('secret', true) ?: getenv('secret');
+        $secret1 = getenv('secret1', true) ?: getenv('secret1');
+        $this->config = [
+            'brandname' => 'maul',
+            'environment' => 'sandbox',
+            'clientid' => 'fakelogin',
+            'secret' => $secret,
+            'secret1' => $secret1,
+            'secretsb' => $secret,
+            'secret1sb' => $secret1];
+        $DB->set_field('payment_gateways', 'config', json_encode($this->config), []);
+    }
 
-        $config = new \stdClass();
-        $config->clientid = $this->login;
-        $config->brandname = 'maul';
-        $config->environment = 'sandbox';
-        $config->secret = $this->secret;
-        $config->secret1 = $this->secret1;
-        $config->country = 'UG';
-        $DB->set_field('payment_gateways', 'config', json_encode($config), []);
+    /**
+     * Test MTN Africa helper
+     * @covers \paygw_mtnafrica\mtn_helper
+     */
+    public function test_empty_helper() {
+        $this->assertEquals('Accepted', mtn_helper::ta_code(202));
+        $this->assertEquals('sandbox', mtn_helper::target_code('BE'));
     }
 
     /**
@@ -73,30 +73,56 @@ class mtn_helper_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\mtn_helper
      * @covers \paygw_mtnafrica\event\request_log
      */
-    public function test_empty_helper() {
-        $helper = new \paygw_mtnafrica\mtn_helper('fakelogin', 'user', 'fake');
-        $this->assertEquals(get_class($helper), 'paygw_mtnafrica\mtn_helper');
-        $this->assertEquals('Accepted', $helper->ta_code(202));
-        $this->assertEquals('sandbox', $helper->target_code('BE'));
+    public function test_other_helper() {
+        global $DB;
+        if ($this->config['secret'] == '') {
+            $this->markTestSkipped('No login credentials');
+        }
+        $generator = $this->getDataGenerator();
+        $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
+        $course = $generator->create_course();
+        $user = $generator->create_user(['country' => 'UG', 'phone2' => '123456789']);
+        $data = ['courseid' => $course->id, 'customint1' => $account->get('id'), 'cost' => 100, 'currency' => 'EUR', 'roleid' => 5];
+        $feeplugin = enrol_get_plugin('fee');
+        $feeid = $feeplugin->add_instance($course, $data);
+        $this->setUser($user);
+        $mtnhelper = new mtn_helper($this->config);
+        $this->assertEquals(get_class($mtnhelper), 'paygw_mtnafrica\mtn_helper');
         $random = random_int(1000000000, 9999999999);
         try {
-            $helper->request_payment($random, "fee 13 4", 100, 'EUR', '1234567', 'BE');
+            $mtnhelper->request_payment($random, 'enrol_fee-fee-13-' . $user->id, 100, 'EUR', '1234567', 'BE');
         } catch (\moodle_exception $e) {
             $this->assertStringContainsString('Invalid country code', $e->getmessage());
         }
+        $result = $mtnhelper->request_payment($random, 'enrol_fee-fee-13-' . $user->id, 100, 'EUR', '123456789', 'UG');
+        $xref = $result['xreferenceid'];
+        $token = $result['token'];
+        $mtnhelper->transaction_enquiry($xref, $token);
+        $mtnhelper->valid_user('123456789');
+        $result = $mtnhelper->current_user_data();
+        $this->assertEquals('123456789', $result['phone']);
+        $data = new \stdClass;
+        $data->paymentid = $feeid;
+        $data->userid = $user->id;
+        $data->transactionid = $xref;
+        $data->moneyid = $token;
+        $data->timecreated = time();
+        $DB->insert_record('paygw_mtnafrica', $data);
+        $mtnhelper->enrol_user($xref, $feeid, 'enrol_fee', 'fee');
     }
 
     /**
      * Test using datasource for MTN Africa payment
      * @param string $input
      * @param string $output
+     * @param string $reason
      * @covers \paygw_mtnafrica\mtn_helper
      * @covers \paygw_mtnafrica\event\request_log
      * @covers \paygw_mtnafrica\external\transaction_complete
      * @dataProvider provide_user_data
      */
-    public function test_with_dataprovider(string $input, string $output) {
-        if ($this->login == 'fakelogin') {
+    public function test_with_dataprovider(string $input, string $output, string $reason = '') {
+        if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
         $generator = $this->getDataGenerator();
@@ -108,18 +134,21 @@ class mtn_helper_test extends \advanced_testcase {
         $feeid = $feeplugin->add_instance($course, $data);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_mtnafrica\mtn_helper($this->login, $this->secret, $this->secret1);
+        $mtnhelper = new mtn_helper($this->config);
         $userid = $user->id;
-        $result = $helper->request_payment($random, "fee $feeid $userid", 10, 'EUR', $input, 'UG');
+        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-$feeid-$userid", 10, 'EUR', $input, 'UG');
         $xref = $result['xreferenceid'];
         $token = $result['token'];
-        $result = $helper->transaction_enquiry($xref, $token);
+        $result = $mtnhelper->transaction_enquiry($xref, $token);
         $output = strtoupper($output);
         $this->assertEquals($output, $result['status']);
+        if ($result['status'] == 'FAILED') {
+            $this->assertEquals($reason, $result['reason']);
+        }
         if ($result['status'] == 'PENDING' && $input == '46733123454') {
             for ($i = 1; $i < 11; $i++) {
-                sleep(15);
-                $result = $helper->transaction_enquiry($xref, $token);
+                sleep(16);
+                $result = $mtnhelper->transaction_enquiry($xref, $token);
                 if ($result['status'] == 'SUCCESSFUL') {
                     $this->assertEquals('EUR', $result['currency']);
                     break;
@@ -136,85 +165,35 @@ class mtn_helper_test extends \advanced_testcase {
      */
     public function provide_user_data(): array {
         return [
-            'Failed' => ['46733123450', 'failed'],
-            'Rejected' => ['46733123451', 'failed'],
-            'Timeout' => ['46733123452', 'failed'],
+            'Failed' => ['46733123450', 'failed', 'INTERNAL_PROCESSING_ERROR'],
+            'Rejected' => ['46733123451', 'failed', 'APPROVAL_REJECTED'],
+            'Timeout' => ['46733123452', 'failed', 'EXPIRED'],
             'Ongoing' => ['46733123453', 'pending'],
             'Pending' => ['46733123454', 'pending'],
-            'Succes' => ['46733123455', 'failed']];
+            'Succes' => ['46733123999', 'successful', 'SUCCESSFUL'],
+        ];
     }
 
     /**
-     * Test manual MTN Africa payment
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
-     */
-    public function test_mtn_manualy() {
-        if ($this->login == 'fakelogin') {
-            $this->markTestSkipped('No login credentials');
-        }
-        $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $this->phone]);
-        $this->setUser($user);
-        $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_mtnafrica\mtn_helper($this->login, $this->secret, $this->secret1);
-        $result = $helper->request_payment($random, "fee 13 $user->id", 1000, 'EUR', $this->phone, 'UG');
-        $this->assertEquals(202, $result['code']);
-        $result = $helper->transaction_enquiry($result['xreferenceid'], $result['token']);
-        $this->assertEquals('PENDING', $result['status']);
-        $this->assertTrue = $helper->valid_user($this->phone);
-    }
-
-    /**
-     * Test error codes
+     * Test success codes
      * @covers \paygw_mtnafrica\mtn_helper
      * @covers \paygw_mtnafrica\event\request_log
      */
     public function test_mtn_codes() {
-        if ($this->login == 'fakelogin') {
+        if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
-        $phone = '46733123451';
+        $phone = '46733123999';
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
-        $helper = new \paygw_mtnafrica\mtn_helper($this->login, $this->secret, $this->secret1);
-
-        $result = $helper->request_payment($random, "fee 13 $user->id", 1000, 'EUR', $phone, 'UG');
+        $mtnhelper = new mtn_helper($this->config);
+        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-14-$user->id", 11, 'EUR', $phone, 'UG');
         $this->assertEquals(202, $result['code']);
-        $result = $helper->transaction_enquiry($result['xreferenceid'], $result['token']);
-        $this->assertEquals('FAILED', $result['status']);
-    }
-
-    /**
-     * Test callback
-     * @covers \paygw_mtnafrica\mtn_helper
-     */
-    public function test_callback() {
-        if ($this->login != 'fakelogin') {
-            $this->markTestSkipped('No login credentials');
-        }
-        // TODO: we should use an external server to test out the callback.
-        $location = 'https://test.ewallah.net/payment/gateway/mtnafrica/callback.php';
-        $data = ['transaction' => [
-           'id' => 'BBZMiscxy',
-           'message' => 'Paid UGX 5,000 to MAUL, Charge UGX 140, Trans ID MP210603.1234.L06941.',
-           'status_code' => 'TS',
-           'mtn_money_id' => 'MP210603.1234.L06941']];
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_PROXY, $location);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_VERBOSE, false);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($curl, CURLOPT_URL, $location);
-        $result = curl_exec($curl);
-        $this->assertStringNotContainsString('MAUL', $result);
-        @curl_close($curl);
+        $result = $mtnhelper->transaction_enquiry($result['xreferenceid'], $result['token']);
+        $this->assertEquals('SUCCESSFUL', $result['status']);
+        $this->assertEquals(11, $result['amount']);
+        $this->assertEquals('EUR', $result['currency']);
+        $this->assertEquals("enrol_fee-fee-14-$user->id", $result['payeeNote']);
     }
 }

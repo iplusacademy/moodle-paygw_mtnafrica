@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * paygw_mtnafrica installer script.
+ * Checks.
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -23,14 +23,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Installer script.
- *
- */
-function xmldb_paygw_mtnafrica_install() {
-    global $CFG;
+namespace paygw_mtnafrica\check;
 
-    // Enable the mtn payment gateway on installation. It still needs to be configured and enabled for accounts.
-    $order = (!empty($CFG->paygw_plugins_sortorder)) ? explode(',', $CFG->paygw_plugins_sortorder) : [];
-    set_config('paygw_plugins_sortorder', join(',', array_merge($order, ['mtnafrica'])));
+use \core\check\{check, result};
+
+/**
+ * Checks.
+ *
+ * @package    paygw_mtnafrica
+ * @copyright  2023 Medical Access Uganda
+ * @author     Renaat Debleu <info@eWallah.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class mtnafrica extends check {
+
+    /**
+     * Collect result.
+     *
+     * @return result
+     */
+    public function get_result(): result {
+        $summary = get_string('check_warning', 'paygw_mtnafrica');
+        $details = get_string('check_details', 'paygw_mtnafrica');
+        return new result(result::WARNING, $summary, $details);
+    }
 }
