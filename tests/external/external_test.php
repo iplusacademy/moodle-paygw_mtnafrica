@@ -59,14 +59,18 @@ class external_test extends \advanced_testcase {
         $user = $generator->create_user(['country' => 'UG', 'phone2' => $this->phone]);
         $data = ['courseid' => $course->id, 'customint1' => $account->get('id'), 'cost' => 66, 'currency' => 'EUR', 'roleid' => 5];
         $feeplugin = enrol_get_plugin('fee');
+        $secret = getenv('secret', true) ?: getenv('secret');
+        $secret1 = getenv('secret1', true) ?: getenv('secret1');
         $this->feeid = $feeplugin->add_instance($course, $data);
-        $this->login = getenv('login') ? getenv('login') : 'fakelogin';
+        $this->login = $secret == '' ? 'fakelogin' : 'maul';
         $config = new \stdClass();
         $config->clientid = $this->login;
         $config->brandname = 'maul';
         $config->environment = 'sandbox';
-        $config->secret = getenv('secret') ? getenv('secret') : 'fakesecret';
-        $config->secret1 = getenv('secret') ? getenv('secret') : 'fakesecret';
+        $config->secret = $secret;
+        $config->secret1 = $secret1;
+        $config->secretsb = $secret;;
+        $config->secret1sb = $secret1;
         $config->country = 'UG';
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
         $this->setUser($user);
@@ -134,8 +138,9 @@ class external_test extends \advanced_testcase {
             $this->markTestSkipped('No login credentials');
         }
         $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $this->phone, $USER->country);
-        $result = transaction_complete::execute('enrol_fee', 'fee',
-            $this->feeid, $result['xreferenceid'], $USER->id, $result['token']);
+        $this->assertArrayHasKey('transactionid', $result);
+        $xref = $result['transactionid'];
+        $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $xref);
         $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
     }
@@ -147,10 +152,10 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_complete_cycle() {
-        global $USER;
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
         }
+        $random = random_int(1000000000, 9999999999);
         $result = get_config_for_js::execute('enrol_fee', 'fee', $this->feeid);
         $this->assertArrayHasKey('clientid', $result);
         $this->assertEquals('maul', $result['brandname']);
@@ -159,21 +164,15 @@ class external_test extends \advanced_testcase {
         $this->assertEquals('EUR', $result['currency']);
         $this->assertEquals($this->phone, $result['phone']);
         $this->assertEquals('UG', $result['usercountry']);
-        $this->assertEquals($USER->id, $result['userid']);
         $this->assertArrayHasKey('reference', $result);
-        $userid = $result['userid'];
-
-        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, 'random', $result['phone'], $result['country']);
-        $xref = $result['xreferenceid'];
-        $token = $result['token'];
-        $this->assertEquals(202, $result['returncode']);
-        $this->assertArrayHasKey('xreferenceid', $result);
+        $result = transaction_start::execute('enrol_fee', 'fee', $this->feeid, $random, $result['phone'], $result['country']);
+        $this->assertArrayHasKey('transactionid', $result);
+        $xref = $result['transactionid'];
         $this->assertEquals('Accepted', $result['message']);
-        $this->assertArrayHasKey('token', $result);
 
-        for ($i = 1; $i < 11; $i++) {
+        for ($i = 1; $i < 6; $i++) {
             sleep(16);
-            $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $xref, $userid, $token);
+            $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $xref);
             $this->assertArrayHasKey('success', $result);
             $this->assertArrayHasKey('message', $result);
             if ($result['success']) {
@@ -218,6 +217,9 @@ class external_test extends \advanced_testcase {
      */
     public function test_payable() {
         global $CFG;
+        if ($this->login == 'fakelogin') {
+            $this->markTestSkipped('No login credentials');
+        }
         $generator = $this->getDataGenerator();
         $user = $generator->create_user(['country' => 'UG']);
         $course = $generator->create_course();
@@ -245,5 +247,28 @@ class external_test extends \advanced_testcase {
         $context = \context_course::instance($course->id);
         $this->assertTrue(is_enrolled($context, $user));
         $this->assertTrue(user_has_role_assignment($user->id, 5, $context->id));
+    }
+
+    /**
+     * Test inserting record.
+     * @covers \paygw_mtnafrica\external\transaction_start
+     */
+    public function test_inserting_record() {
+        global $DB;
+        $str = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSMjU2In0.eyJjbGllbnRJZCI6IjFmYmFmNmRhLTJjODQtNDc4NC1iOWQ0LTExMzc0MTIzYjllNCIsImV4cGlyZ';
+        $str .= '-8-hBKkY1fo8XZpo_qyCP3BBTKi4KOW96_THSbUHn0_t1w2Noq-Xv1z1keCMY6USScv17S0lf8zMxHBg4GouB_ok1BwtiI-4LG6yy4pMQYRbiG4n';
+        $str .= 'XMiOiIyMDIzLTA2LTMwVDE1OjI1OjQ1LjcwNCIsInNlc3Npb25JZCI6IjIxNzY1NTEzLWJkZjEtNGIwZC05MTFhLTMxYTNiYjU3ZDQzOSJ9.DsWH';
+        $str .= 'nCTDURtza_3d7P6tTtmBKFh3YrD8Xu-bocWCW3ke9gDJ1D7DsXPQ3YIkp1Pq0Xm9L7AKDIzlYf83HW5R2ZoryG-dFXYDmJxYzO5CPMquT8LMhy0S';
+        $str .= '6te5SCS-9eiHZN2vv9QCYgSIcZlMNdlysJv_wVUdgK5AQVIYvRJHtPNR7rYK8FBW5ke_mH-w8KbVW-lLibZPKroLmQ9OOZ_vzKY9GAkE8NDa0o9c';
+        $str .= 'nCTDURtza_3d7P6tTtmBKFh3YrD8Xu-bocWCW3ke9gDJ1D7DsXPQ3YIkp1Pq0Xm9L7AKDIzlYf83HW5R2ZoryG-dFXYDmJxYzO5CPMquT8LMhy0S';
+        $data = new \stdClass;
+        $data->paymentid = '33';
+        $data->userid = 2;
+        $data->transactionid = '94559210-0b27-4077-98bc-56035ef472f2';
+        $data->moneyid = $str;
+        $data->component = 'enrol_fee';
+        $data->paymentarea = 'fee';
+        $data->timecreated = time();
+        $DB->insert_record('paygw_mtnafrica', $data);
     }
 }

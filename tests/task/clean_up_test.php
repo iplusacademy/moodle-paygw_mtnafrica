@@ -15,33 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Coverage info
+ * Testing cleanup
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+
+namespace paygw_mtnafrica\task;
 
 /**
- * Coverage info
+ * Testing cleanup
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-return new class extends phpunit_coverage_info {
-    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
-    protected $includelistfolders = ['classes'];
+class clean_up_test extends \advanced_testcase {
 
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
-
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = ['db', 'lang'];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
-};
+    /**
+     * Test clean up.
+     * @covers \paygw_mtnafrica\task\clean_up
+     */
+    public function test_clean_up() {
+        $this->resetAfterTest();
+        $task = new \paygw_mtnafrica\task\clean_up();
+        $task->get_name();
+        $task->execute();
+    }
+}

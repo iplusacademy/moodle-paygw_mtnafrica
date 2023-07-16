@@ -15,33 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Coverage info
+ * Testing callback in MTN Africa payments API
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+
+namespace paygw_mtnafrica;
 
 /**
- * Coverage info
+ * Testing callback in MTN Africa payments API
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-return new class extends phpunit_coverage_info {
-    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
-    protected $includelistfolders = ['classes'];
+class behat_test extends \advanced_testcase {
 
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
+    /**
+     * Setup function.
+     */
+    protected function setUp(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
+        require_once($CFG->dirroot . '/payment/gateway/mtnafrica/tests/behat/behat_paygw_mtnafrica.php');
+        $this->resetAfterTest(true);
+    }
 
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = ['db', 'lang'];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
-};
+    /**
+     * Test callback.
+     * @covers \behat_paygw_mtnafrica
+     */
+    public function test_behat() {
+        $behat = new \behat_paygw_mtnafrica();
+        $behat->i_configure_mtn();
+    }
+}

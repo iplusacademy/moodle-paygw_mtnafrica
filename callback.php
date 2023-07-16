@@ -22,6 +22,7 @@
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+define('NO_DEBUG_DISPLAY', true);
 
 // @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../config.php');
@@ -30,11 +31,46 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     http_response_code(405);
 } else {
     if ($response = json_decode(file_get_contents('php://input'), true)) {
-        if (isset($response['status'])) {
-            $status = $response['status'];
-            $eventargs = ['context' => \context_system::instance(), 'other' => $response];
-            $event = \paygw_mtnafrica\event\request_log::create($eventargs);
-            $event->trigger();
+
+        // Sample data:
+        // [financialTransactionId] => 2026118745
+        // [externalId] => 2362616710
+        // [amount] => 100
+        // [currency] => EUR
+        // [payer] => {[partyIdType] => MSISDN, [partyId] => 1234567}
+        // [payerMessage] => Thanks for your payment
+        // [payeeNote] => enrol_fee-fee-13-4
+        // [status] => SUCCESSFUL.
+
+        $gateway = 'mtnafrica';
+        $table = 'paygw_mtnafrica';
+        $transactionid = \paygw_mtnafrica\mtn_helper::array_helper('externalId', $response);
+        if ($transactionid) {
+            $cond = ['transactionid' => $transactionid];
+            if ($DB->record_exists($table, $cond)) {
+                $payrec = $DB->get_record($table, $cond);
+                $status = \paygw_mtnafrica\mtn_helper::array_helper('status', $response);
+                $ramount = \paygw_mtnafrica\mtn_helper::array_helper('amount', $response);
+                $rcurrency = \paygw_mtnafrica\mtn_helper::array_helper('currency', $response);
+                $rmessage = \paygw_mtnafrica\mtn_helper::array_helper('payeeNote', $response);
+                $exp = explode('-', $rmessage);
+                $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $exp[1], 'id' => $payrec->paymentid]);
+                $eventargs = [
+                    'context' => \context_course::instance($courseid),
+                    'userid' => $payrec->userid,
+                    'other' => ['message' => $rmessage, 'id' => $transactionid, 'mtn_money_id' => $rtransid]];
+                \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
+                $conf = \core_payment\helper::get_gateway_configuration($exp[0], $exp[1], $payrec->paymentid, $gateway);
+                $helper = new \paygw_mtnafrica\mtn_helper($conf);
+                $payable = helper::get_payable($exp[0], $exp[1], $transactionid);
+                $payid = $payable->get_account_id();
+                $currency = $payable->get_currency();
+                $surcharge = helper::get_gateway_surcharge($gateway);
+                $amount = helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
+                if ($status && $status == 'SUCCESSFUL' && $currency == $rcurrency && $amount == $ramount) {
+                     $helper->enrol_user($transactionid, $payrec->paymentid, $exp[0], $exp[1]);
+                }
+            }
         }
     }
 }

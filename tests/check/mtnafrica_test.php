@@ -15,33 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Coverage info
+ * Testing security checks
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+
+namespace paygw_mtnafrica\check;
 
 /**
- * Coverage info
+ * Testing security checks
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-return new class extends phpunit_coverage_info {
-    /** @var array The list of folders relative to the plugin root to include in coverage generation. */
-    protected $includelistfolders = ['classes'];
+class mtnafrica_test extends \advanced_testcase {
 
-    /** @var array The list of files relative to the plugin root to include in coverage generation. */
-    protected $includelistfiles = [];
-
-    /** @var array The list of folders relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfolders = ['db', 'lang'];
-
-    /** @var array The list of files relative to the plugin root to exclude from coverage generation. */
-    protected $excludelistfiles = ['version.php', 'settings.php', 'callback.php'];
-};
+    /**
+     * Test checks.
+     * @covers \paygw_mtnafrica\check\mtnafrica
+     */
+    public function test_checks() {
+        global $CFG;
+        require_once($CFG->dirroot . '/payment/gateway/mtnafrica/lib.php');
+        $checks = paygw_mtnafrica_security_checks();
+        $this->assertCount(1, $checks);
+        $check = new \paygw_mtnafrica\check\mtnafrica();
+        $this->assertEquals('warning', $check->get_result()->get_status());
+        $this->assertEmpty($check->get_action_link());
+    }
+}

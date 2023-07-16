@@ -30,7 +30,7 @@ import Ajax from 'core/ajax';
  * @param {string} paymentArea The area of the component that the itemId belongs to
  * @param {number} itemId An internal identifier that is used by the component
  * @returns {Promise<{clientid: string, brandname: string, country: string, cost: number, currency: string, phone: string,
- *                    usercountry: string, userid: number, reference: string }>}
+ *                    usercountry: string, timeout: number, reference: string }>}
  */
 export const getConfigForJs = (component, paymentArea, itemId) => {
     const request = {
@@ -51,21 +51,15 @@ export const getConfigForJs = (component, paymentArea, itemId) => {
  * @param {string} component Name of the component that the itemId belongs to
  * @param {string} paymentArea The area of the component that the itemId belongs to
  * @param {number} itemId An internal identifier that is used by the component
- * @param {string} ourReference The reference we use
- * @param {string} userPhone The users phone number
- * @param {string} userCountry the country of the user
- * @returns {Promise<transactionid: string, message: string}>}
+ * @returns {Promise<{transactionid: string, message: string}>}
  */
-export const transactionStart = (component, paymentArea, itemId, ourReference, userPhone, userCountry) => {
+export const transactionStart = (component, paymentArea, itemId) => {
     const request = {
         methodname: 'paygw_mtnafrica_transaction_start',
         args: {
             component,
             paymentarea: paymentArea,
             itemid: itemId,
-            reference: ourReference,
-            phone: userPhone,
-            country: userCountry,
         },
     };
 
@@ -78,21 +72,17 @@ export const transactionStart = (component, paymentArea, itemId, ourReference, u
  * @param {string} component Name of the component that the itemId belongs to
  * @param {string} paymentArea The area of the component that the itemId belongs to
  * @param {number} itemId An internal identifier that is used by the component
- * @param {string} orderId The order id coming back from MTN Africa
- * @param {number} userId The user who paid
- * @param {number} sleep How long do we sleep
+ * @param {string} transactionId The order id coming back from MTN Africa
  * @returns {Promise<{success: string, message: string}>}
  */
-export const transactionComplete = (component, paymentArea, itemId, orderId, userId, sleep) => {
+export const transactionComplete = (component, paymentArea, itemId, transactionId) => {
     const request = {
         methodname: 'paygw_mtnafrica_transaction_complete',
         args: {
             component,
             paymentarea: paymentArea,
             itemid: itemId,
-            orderid: orderId,
-            userid: userId,
-            sleep,
+            transactionid: transactionId,
         },
     };
 

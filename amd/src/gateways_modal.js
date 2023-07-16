@@ -22,9 +22,12 @@
  */
 
 import * as Repository from './repository';
-import Templates from 'core/templates';
+import Ajax from 'core/ajax';
+import Config from 'core/config';
+import Log from 'core/log';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
+import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
 
 /**
@@ -63,15 +66,6 @@ export const process = (component, paymentArea, itemId, description) => {
         userCountry.append('<h4>' + mtnConfig.usercountry + '</h4>');
         const extraDiv = modal.getRoot().find('#mtn-extra');
         extraDiv.append('<h4>' + mtnConfig.cost + ' ' + mtnConfig.currency + '</h4>');
-        const payForm = modal.getRoot().find('#mtn-form');
-        payForm.append('<input type="hidden" name="userid" value="' + mtnConfig.userid + '" />');
-        payForm.append('<input type="hidden" name="phone" value="' + mtnConfig.phone + '" />');
-        payForm.append('<input type="hidden" name="country" value="' + mtnConfig.country + '" />');
-        payForm.append('<input type="hidden" name="component" value="' + component + '" />');
-        payForm.append('<input type="hidden" name="paymentarea" value="' + paymentArea + '" />');
-        payForm.append('<input type="hidden" name="itemid" value="' + itemId + '" />');
-        payForm.append('<input type="hidden" name="description" value="' + description + '" />');
-        payForm.append('<input type="hidden" name="reference" value="' + mtnConfig.reference + '" />');
         modal.getRoot().on(ModalEvents.hidden, () => {
             // Destroy when hidden.
             console.log('Destroy modal');  // eslint-disable-line
@@ -81,85 +75,107 @@ export const process = (component, paymentArea, itemId, description) => {
         return Promise.all([modal, mtnConfig]);
     })
     .then(([modal, mtnConfig]) => {
-        const cancelButton = modal.getRoot().find('#mtn-cancel');
+        var cancelButton = modal.getRoot().find('#mtn-cancel');
         cancelButton.on('click', function() {
             modal.destroy();
         });
-        const payButton = modal.getRoot().find('#mtn-pay');
+        var payButton = modal.getRoot().find('#mtn-pay');
         payButton.removeAttr('disabled');
         payButton.on('click', function(e) {
             e.preventDefault();
-            modal.setBody(Templates.render('paygw_mtnafrica/busy', {}));
-
-            return Promise.all([
-                Repository.transactionStart(component, paymentArea, itemId, mtnConfig.reference, mtnConfig.phone, mtnConfig.country)
+            Promise.all([
+                Repository.transactionStart(component, paymentArea, itemId),
             ])
             .then(([mtnPay]) => {
-                const cancelButton1 = modal.getRoot().find('#mtn-cancel');
-                cancelButton1.on('click', function() {
+                const transId = mtnPay.transactionid;
+                modal.setBody(Templates.render('paygw_mtnafrica/busy', {
+                    "sesskey": Config.sesskey,
+                    "phone": mtnConfig.phone,
+                    "country": mtnConfig.country,
+                    "component": component,
+                    "paymentarea": paymentArea,
+                    "transactionid": transId,
+                    "itemid": itemId,
+                    "description": description,
+                    "reference": mtnConfig.reference,
+                }));
+                cancelButton = modal.getRoot().find('#mtn-cancel');
+                cancelButton.on('click', function() {
+                    e.preventDefault();
                     modal.destroy();
                 });
-                if (mtnPay.code == 200) {
-                    console.log('mtn Africa payment process started');  // eslint-disable-line
-                    console.log('TransactionId: ' + mtnPay.xreferenceid);  // eslint-disable-line
-                    console.log('Token: ' + mtnPay.token);  // eslint-disable-line
-                    const outDiv = modal.getRoot().find('#mtn-out');
-                    const spinnerDiv = modal.getRoot().find('#mtn-spinner');
-                    outDiv.append('<h4>TransactionId: ' + mtnPay.xreferenceid + '</h4>');
-                    var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                    var interval = 20000;
-                    const b = '</div>';
-                    const progressDiv = modal.getRoot().find('#mtn-progress_bar');
-                    arrayints.forEach(function(el, index) {
-                        setTimeout(function() {
+                payButton = modal.getRoot().find('#mtn-pay');
+                payButton.on('click', function() {
+                    modal.destroy();
+                });
+                console.log('mtn Africa payment process started');  // eslint-disable-line
+                console.log('Reference id: ' + transId);  // eslint-disable-line
+                var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                var interval = mtnConfig.timeout;
+                var cont = true;
+                const b = '</div>';
+                arrayints.forEach(function(el, index) {
+                    setTimeout(function() {
+                        if (cont == true) {
+                            var progressDiv = modal.getRoot().find('#mtn-progress_bar');
                             progressDiv.attr('value', el * 10);
                             if (mtnPay.xreferenceid != '') {
-                                modal.setFooter('Step ' + el + '/10');
-                                Promise.all([
-                                    Repository.transactionComplete(
-                                        component, paymentArea, itemId, mtnPay.transactionid, mtnConfig.userid, mtnPay.token),
-                                ])
-                                .then(([mtnPing]) => {
-                                    modal.setFooter(mtnPing.message);
-                                    console.log(mtnPing.message);  // eslint-disable-line
-                                    if (mtnPing.success) {
-                                        if (mtnPing.message == 'SUCCESSFUL') {
-                                            const a = '<br/><div class="p-3 mb-2 text-success font-weight-bold">';
+                                Ajax.call([{
+                                    methodname: "paygw_mtnafrica_transaction_complete",
+                                    args: {
+                                        component,
+                                        paymentarea: paymentArea,
+                                        itemid: itemId,
+                                        xreferenceid: transId,
+                                    },
+                                    done: function(mtnPing) {
+                                        modal.setFooter(el + '/10 ' + mtnPing.message);
+                                        console.log(el + '/10 ' + mtnPing.message);  // eslint-disable-line
+                                        var spinnerDiv = modal.getRoot().find('#mtn-spinner');
+                                        if (mtnPing.success) {
+                                            if (mtnPing.message == 'SUCCESSFUL') {
+                                                cont = false;
+                                                progressDiv.attr('value', 100);
+                                                spinnerDiv.attr('style', 'display: none;');
+                                                var cancelButton = modal.getRoot().find('#mtn-cancel');
+                                                cancelButton.attr('style', 'display: none;');
+                                                modal.setFooter('Transaction '+ transId + ' Succes');
+                                                payButton.on('click', function() {
+                                                    const loc = window.location.href;
+                                                    window.location.replace(loc);
+                                                });
+                                            }
+                                        } else {
+                                            cont = false;
+                                            const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
+                                            var outDiv = modal.getRoot().find('#mtn-out');
                                             outDiv.append(a + mtnPing.message + b);
-                                            const payButton1 = modal.getRoot().find('#mtn-pay');
-                                            payButton1.removeAttr('disabled');
-                                            payButton1.on('click', function() {
-                                                modal.destroy();
-                                            });
                                             spinnerDiv.attr('style', 'display: none;');
-                                            cancelButton1.attr('style', 'display: none;');
                                             return;
                                         }
-                                    } else {
-                                        const a = '<br/><div class="p-3 mb-2 bg-danger text-white font-weight-bold">';
-                                        outDiv.append(a + mtnPing.message + b);
-                                        spinnerDiv.attr('style', 'display: none;');
-                                        return;
+                                    },
+                                    fail: function(e) {
+                                        console.log(getString('failed', 'paygw_mtnafrica'));  // eslint-disable-line
+                                        Log.debug(e);
                                     }
-                                });
+                                }]);
+                                if (el > 9) {
+                                    modal.destroy();
+                                }
                             }
-                            if (el == 10) {
-                                modal.destroy();
-                            }
-                        }, index * interval);
-                    });
-                } else {
-                    console.log('mtn Africa transaction FAILED');  // eslint-disable-line
-                    modal.setFooter('FAILED');
-                }
-            }).catch(e => {
-                // We want to use promise reject here - as that's what core payment stuff expects.
-                console.log('mtn Africa payment rejected');  // eslint-disable-line
-                return Promise.reject(e.message);
+                        }
+                    }, index * interval);
+                });
+                return new Promise(() => null);
+            }).catch(function() {
+                modal.setBody(getString('unable', 'paygw_mtnafrica'));
+                console.log('Unable to connect to MTN');  // eslint-disable-line
             });
         });
         return new Promise(() => null);
     }).catch(e => {
+        Log.debug('Global error.');
+        Log.debug(e);
         return Promise.reject(e.message);
     });
 };

@@ -22,49 +22,26 @@ Feature: MTN Africa payment gateway
       | manager1 | C1     | manager |
       | manager1 | C2     | manager |
     And the following "core_payment > payment accounts" exist:
-      | name           | gateways  |
-      | Account1       | mtnafrica |
+      | name     | gateways  |
+      | Account1 | mtnafrica |
     And I log in as "admin"
-    And I navigate to "Plugins > Enrolments > Manage enrol plugins" in site administration
-    And I click on "Enable" "link" in the "Enrolment on payment" "table_row"
-    And I navigate to "Payments > Payment accounts" in site administration
-    And I click on "MTN Africa" "link" in the "Account1" "table_row"
-    Then I should see "Brand name"
-    And I should see "Client ID"
-    And I should see "Primary key"
-    And I should see "Environment"
-    And I set the following fields to these values:
-      | Brand name    | Test brand  |
-      | Client ID     | Test_id     |
-      | Primary key   | Test_Secret |
-      | Secondary key | Test_Secret |
-      | Environment   | Sandbox     |
-      | Country       | Uganda      |
-    And I press "Save changes"
-    And I log out
-    And I log in as "manager1"
-    And I am on the "Course 1" "enrolment methods" page
-    And I select "Enrolment on payment" from the "Add method" singleselect
-    And I set the following fields to these values:
+    And I configure mtn
+    And I add "Enrolment on payment" enrolment method in "Course 1" with:
       | Payment account | Account1 |
-      | Enrolment fee   | 123.45   |
+      | Enrolment fee   | 50       |
       | Currency        | Euro     |
-    And I press "Add method"
-    And I am on the "Course 2" "enrolment methods" page
-    And I select "Enrolment on payment" from the "Add method" singleselect
-    And I set the following fields to these values:
-      | Payment account | Account1         |
-      | Enrolment fee   | 123.45           |
-      | Currency        | Congolese Franc  |
-    And I press "Add method"
+    And I add "Enrolment on payment" enrolment method in "Course 2" with:
+      | Payment account | Account1        |
+      | Enrolment fee   | 5000            |
+      | Currency        | Congolese Franc |
     And I log out
 
   @javascript
   Scenario: Student can cancel MTN Africa payment
-    When I log in as "student1"
+    Given I log in as "student1"
     And I am on course index
     And I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    When I should see "This course requires a payment for entry."
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
@@ -73,51 +50,73 @@ Feature: MTN Africa payment gateway
 
   @javascript
   Scenario: Student can see the MTN Africa payment prompt on the course enrolment page
+    Given I log in as "student1"
+    And I am on course index
+    When I follow "Course 1"
+    Then I should see "This course requires a payment for entry."
+    And I should see "50"
+    And I press "Select payment type"
+    And I should see "MTN Africa" in the "Select payment type" "dialogue"
+    And I should see "50"
+    And I click on "Proceed" "button" in the "Select payment type" "dialogue"
+    And I should see "46733123"
+    And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
+    And I wait "5" seconds
+    And I click on "Cancel" "button" in the "MTN Africa" "dialogue"
+    # And I get a timeout
+
+  @javascript
+  Scenario: Student is enrolled in course after an MTN Africa payment
     When I log in as "student1"
     And I am on course index
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
-    And I press "Select payment type"
+    And I should see "50"
+    When I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
-    And I should see "123"
+    And I should see "50"
+    And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should see "46733123"
+    And I should not see "789012"
+    And I should see "profile page"
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
-    # And I wait "5" seconds
-    #And I click on "Cancel" "button" in the "MTN Africa" "dialogue"
-    # And I get a timeout
+    And I wait until the page is ready
+    And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
+    And I wait until the page is ready
+    # We are in.
+    # Then I should see "Course 1"
+    # And I should see "TestPage"
 
   @javascript
   Scenario: Student should be logged in automatically after an MTN Africa payment
-    When I log in as "student2"
+    Given I log in as "student2"
     And I am on course index
-    And I follow "Course 1"
+    When I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "50"
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
-    And I should see "123"
+    And I should see "50"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
     And I should see "46733123"
-    And I wait "2" seconds
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
-    # Then I should see "blablabla"
+    And I wait until the page is ready
+    And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     # Here we cannot see something as the page is not yet ready.
     # And I should see "TestPage"
 
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page with round price
-    When I log in as "guest"
+    Given I log in as "guest"
     And I am on course index
-    And I follow "Course 1"
+    When I follow "Course 1"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "50"
     And I should see "Log in to the site"
 
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page
-    When I log in as "guest"
+    Given I log in as "guest"
     And I am on course index
-    And I follow "Course 2"
+    When I follow "Course 2"
     Then I should see "This course requires a payment for entry."
-    And I should see "123"
+    And I should see "5,000.00"
     And I should see "Log in to the site"

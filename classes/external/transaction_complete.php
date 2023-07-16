@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace paygw_mtnafrica\external;
 
+use core_payment\helper;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -54,8 +55,6 @@ class transaction_complete extends external_api {
             'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
             'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
             'xreferenceid' => new external_value(PARAM_TEXT, 'The order id coming back from MTN Africa'),
-            'userid' => new external_value(PARAM_INT, 'The user who paid'),
-            'token' => new external_value(PARAM_TEXT, 'The MTN token'),
         ]);
     }
 
@@ -67,49 +66,19 @@ class transaction_complete extends external_api {
      * @param string $paymentarea
      * @param int $itemid An internal identifier that is used by the component
      * @param string $xreferenceid MTN Africa order ID
-     * @param int $userid The user who paid
-     * @param string $token The MTN token
      * @return array
      */
-    public static function execute(
-        string $component, string $paymentarea, int $itemid, string $xreferenceid, int $userid, string $token): array {
-        global $DB;
-        $gateway = 'mtnafrica';
-
+    public static function execute(string $component, string $paymentarea, int $itemid, string $xreferenceid): array {
         self::validate_parameters(self::execute_parameters(), [
             'component' => $component,
             'paymentarea' => $paymentarea,
             'itemid' => $itemid,
             'xreferenceid' => $xreferenceid,
-            'userid' => $userid,
-            'token' => $token,
         ]);
-        $suc = false;
-        $result = ['status' => 'unknown'];
-        $config = (object)\core_payment\helper::get_gateway_configuration($component, $paymentarea, $itemid, $gateway);
-        $payable = \core_payment\helper::get_payable($component, $paymentarea, $itemid);
-        $currency = $payable->get_currency();
-        $surcharge = \core_payment\helper::get_gateway_surcharge($gateway);
-        $amount = \core_payment\helper::get_rounded_cost($payable->get_amount(), $currency, $surcharge);
-        if (property_exists($config, 'clientid') && $config->clientid != '' && $config->secret != '') {
-            $helper = new \paygw_mtnafrica\mtn_helper(
-                $config->clientid,
-                $config->secret,
-                $config->secret1,
-                $config->country,
-                $config->environment,
-                $token);
-            $result = $helper->transaction_enquiry($xreferenceid, $token);
-            $status = self::array_helper('status', $result);
-            if ($status && $status == 'SUCCESSFUL') {
-                $paymentid = \core_payment\helper::save_payment(
-                    $payable->get_account_id(), $component, $paymentarea, $itemid, $userid, $amount, $currency, $gateway);
-                $record = ['paymentid' => $paymentid, 'pp_xreferenceid' => self::array_helper('externalId', $result)];
-                $suc = $DB->insert_record('paygw_mtnafrica', $record);
-                $suc = $suc && \core_payment\helper::deliver_order($component, $paymentarea, $itemid, $paymentid, $userid);
-            }
-        }
-        return ['success' => $suc, 'message' => $result['status']];
+        $config = helper::get_gateway_configuration($component, $paymentarea, $itemid, 'mtnafrica');
+        $helper = new mtn_helper($config);
+        $trans = $helper->enrol_user($xreferenceid, $itemid, $component, $paymentarea);
+        return ['success' => $trans != 'FAILED', 'message' => $trans];
     }
 
     /**
@@ -122,16 +91,5 @@ class transaction_complete extends external_api {
             'success' => new external_value(PARAM_BOOL, 'Whether everything was successful or not.'),
             'message' => new external_value(PARAM_RAW, 'Message (usually the error message).'),
         ]);
-    }
-
-    /**
-     * Array helper.
-     *
-     * @param string $key
-     * @param array $arr
-     * @return array||bool
-     */
-    private static function array_helper(string $key, array $arr) {
-        return (array_key_exists($key, $arr)) ? $arr[$key] : false;
     }
 }

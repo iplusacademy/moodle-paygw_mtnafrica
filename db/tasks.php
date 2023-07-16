@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Clean up task for the MTN payment gateway plugin.
  *
  * @package    paygw_mtnafrica
  * @copyright  2023 Medical Access Uganda
@@ -25,10 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->requires = 2022041200;
-$plugin->component = 'paygw_mtnafrica';
-$plugin->dependencies = ['enrol_fee' => ANY_VERSION, 'local_aws' => ANY_VERSION];
-$plugin->maturity = MATURITY_RC;
-$plugin->supported = [401, 401];
-$plugin->release = 'v4.1.2';
-$plugin->version = 2023071600;
+$tasks = [[
+    'classname' => '\paygw_mtnafrica\task\clean_up',
+    'blocking' => 0,
+    'minute' => '44',
+    'hour' => '02',
+    'day' => '*',
+    'month' => '*',
+    'dayofweek' => '*',
+    'disabled' => 0]];

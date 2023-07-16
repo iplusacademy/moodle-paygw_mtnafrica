@@ -14,3 +14,7 @@
     text-align: center;
 }
 
+#mtn-progress_bar {
+    background-color: lightgray;
+    color: #fff;
+}
