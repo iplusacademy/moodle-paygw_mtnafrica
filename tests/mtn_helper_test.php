@@ -60,7 +60,6 @@ class mtn_helper_test extends \advanced_testcase {
             'secretsb' => $secret,
             'secret1sb' => $secret1];
         $DB->set_field('payment_gateways', 'config', json_encode($this->config), []);
-        $this->phone = getenv('phone');
     }
 
     /**

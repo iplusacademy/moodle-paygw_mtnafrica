@@ -36,6 +36,7 @@
             <directory suffix=".php">db</directory>
             <directory suffix=".php">lang</directory>
             <file>version.php</file>
+            <file>lib.php</file>
             <file>settings.php</file>
             <file>callback.php</file>
             <file>continue.php</file>

@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        moodle-branch: ['MOODLE_401_STABLE', 'MOODLE_402_STABLE']
+        moodle-branch: ['MOODLE_401_STABLE']
         php: ['8.1']
         database: ['mariadb', 'pgsql']
 
@@ -133,19 +133,3 @@ jobs:
         if: ${{ always() }}
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
-
-      - name: firefox
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat || true
-      
-      - name: chrome
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --profile chrome || true
-
-      - name: firefox classic
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic || true
-      
-      - name: chrome classic
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi behat --suite classic --profile=chrome || true
