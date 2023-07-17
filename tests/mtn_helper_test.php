@@ -39,9 +39,6 @@ class mtn_helper_test extends \advanced_testcase {
     /** @var config configuration */
     private $config;
 
-    /** @var string phone */
-    private $phone = '46733123454';
-
     /**
      * Setup function.
      */

@@ -282,7 +282,6 @@ class mtn_helper {
     private function request_post(
         string $location, array $data, array $headers = [], string $verb = 'POST'): ?array {
 
-        global $CFG;
         $decoded = $result = $resultcode = '';
         $response = null;
         $location = $this->baseurl . $location;
@@ -298,27 +297,25 @@ class mtn_helper {
             mtrace_exception($e);
         } finally {
             $decoded = json_decode($result, true);
-            if ($CFG->debugdeveloper) {
-                $other = ['verb' => $verb, 'location' => $location];
-                $decolog = $decoded;
-                if (is_array($decolog)) {
-                    if (array_key_exists('access_token', $decolog)) {
-                        unset($decolog['access_token']);
-                    }
-                    $other['result'] = $decolog;
-                    // TODO: uncomment for tracing.
-                    // mtrace(json_encode($decolog));.
-                } else {
-                    $resultcode = $response->getStatusCode();
-                    $resultreason = $response->getReasonPhrase();
-                    $other['result'] = $resultcode . ' ' . $resultreason;
-                    // TODO: uncomment for tracing.
-                    // mtrace($resultcode);.
+            $other = ['verb' => $verb, 'location' => $location];
+            $decolog = $decoded;
+            if (is_array($decolog)) {
+                if (array_key_exists('access_token', $decolog)) {
+                    unset($decolog['access_token']);
                 }
-                $eventargs = ['context' => \context_system::instance(), 'other' => $other];
-                // Trigger an event.
-                \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
+                $other['result'] = $decolog;
+                // TODO: uncomment for tracing.
+                // mtrace(json_encode($decolog));.
+            } else {
+                $resultcode = $response->getStatusCode();
+                $resultreason = $response->getReasonPhrase();
+                $other['result'] = $resultcode . ' ' . $resultreason;
+                // TODO: uncomment for tracing.
+                // mtrace($resultcode);.
             }
+            $eventargs = ['context' => \context_system::instance(), 'other' => $other];
+            // Trigger an event.
+            \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
         }
         return $decoded ?? [];
     }
