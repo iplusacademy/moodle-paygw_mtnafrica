@@ -66,6 +66,7 @@ class mtn_helper_test extends \advanced_testcase {
     public function test_empty_helper() {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
         $this->assertEquals('sandbox', mtn_helper::target_code('BE'));
+        $this->assertNotEmpty(mtn_helper::get_hostname());
     }
 
     /**

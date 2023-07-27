@@ -143,11 +143,40 @@ class mtn_helper {
         global $CFG;
         $dom = str_ireplace('http://', '', $CFG->wwwroot);
         $dom = str_ireplace('https://', '', $dom);
-        $dom = str_ireplace('/moodle', '', $dom);
-        $dom = str_ireplace('www.example.com', 'test.ewallah.net', $dom);
+        if (stripos($dom, 'www.example.com') !== false) {
+            // Local domain is example domain while testing, so we have to get the info from config.
+            $dom = str_ireplace('/moodle', '', $dom);
+            $dom = str_ireplace('www.example.com', self::get_hostname(), $dom);
+        }
         return $this->sandbox ? 'http://' . $dom : 'https://' . $dom;
     }
 
+    /**
+     * Which hostname are we running, get the info from config file.
+     *
+     * @return string
+     */
+    public static function get_hostname(): string {
+        $lines = file('config.php');
+        $needle = '$CFG->wwwroot';
+        $result = '127.0.0.1';
+        foreach ($lines as $line) {
+            if (stripos($line, $needle) !== false) {
+                $line = str_ireplace($needle, '', $line);
+                $line = str_ireplace(' ', '', $line);
+                $line = str_ireplace(PHP_EOL, '', $line);
+                $line = str_ireplace(';', '', $line);
+                $line = str_ireplace('=', '', $line);
+                $line = str_ireplace('"', '', $line);
+                $line = str_ireplace("'", '', $line);
+                $line = str_ireplace('http://', '', $line);
+                $line = str_ireplace('https://', '', $line);
+                $result = strip_tags($line);
+                break;
+            }
+        }
+        return $result;
+    }
     /**
      * Collect a token.
      *
