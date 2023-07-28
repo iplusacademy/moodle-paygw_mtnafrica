@@ -133,3 +133,13 @@ jobs:
         if: ${{ always() }}
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
+
+      - name: dml test
+        if: ${{ always() }}
+        run: vendor/bin/phpunit --no-coverage --colors lib/dml/tests/dml_test.php
+        working-directory: moodle
+
+      - name: filelib tests
+        if: ${{ always() }}
+        run: vendor/bin/phpunit --no-coverage --colors lib/tests/filelib_test.php
+        working-directory: moodle
