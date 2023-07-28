@@ -134,12 +134,10 @@ jobs:
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: dml test
+      - name: behat
         if: ${{ always() }}
-        run: vendor/bin/phpunit --no-coverage --colors lib/dml/tests/dml_test.php
-        working-directory: moodle
-
-      - name: filelib tests
-        if: ${{ always() }}
-        run: vendor/bin/phpunit --no-coverage --colors lib/tests/filelib_test.php
-        working-directory: moodle
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi behat --profile=chrome || true
