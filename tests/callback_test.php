@@ -54,7 +54,8 @@ class callback_test extends \advanced_testcase {
      */
     public function test_callback() {
         // TODO: we should use an external server to test out the callback.
-        $location = 'https://test.ewallah.net/payment/gateway/mtnafrica/callback.php';
+        $location = \paygw_mtnafrica\mtn_helper::get_hostname();
+        $location .= '/payment/gateway/mtnafrica/callback.php';
         $data = ['financialTransactionId' => 2026118745,
                 'externalId' => 2362616710,
                 'amount' => 100,
@@ -93,7 +94,8 @@ class callback_test extends \advanced_testcase {
             'itemid' => 82,
             'transactionid' => '4871171159',
             'reference' => 'course33333'];
-        $location = 'https://test.ewallah.net/payment/gateway/mtnafrica/continue.php';
+        $location = \paygw_mtnafrica\mtn_helper::get_hostname();
+        $location .= '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
