@@ -148,9 +148,6 @@ class mtn_helper {
             // Local domain is example domain while testing, so we have to get the info from config.
             $dom = str_ireplace('/moodle', '', $dom);
             $dom = str_ireplace('www.example.com', self::get_hostname(), $dom);
-            // In Github Actions we are still seeing the example domain.
-            $dom = str_ireplace('www.example.com', 'test.ewallah.net', $dom);
-            // Force https on Github Actions.
             $http = 'https://';
         }
         return $http . $dom;
@@ -180,6 +177,9 @@ class mtn_helper {
                 break;
             }
         }
+        // Localhost callbacks are redirected.
+        $result = str_ireplace('localhost', 'test.ewallah.net', $result);
+        $result = str_ireplace('127.0.0.1', 'test.ewallah.net', $result);
         return $result;
     }
     /**
