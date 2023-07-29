@@ -180,6 +180,7 @@ class mtn_helper {
         // Localhost callbacks are redirected.
         $result = str_ireplace('localhost', 'test.medical-access.org', $result);
         $result = str_ireplace('127.0.0.1', 'test.medical-access.org', $result);
+        $result = str_ireplace('/moodle', '', $result);
         return $result;
     }
     /**
