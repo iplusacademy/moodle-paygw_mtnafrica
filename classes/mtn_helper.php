@@ -141,14 +141,17 @@ class mtn_helper {
      */
     private function get_callback_host(): string {
         global $CFG;
+        $http = $this->sandbox ? 'http://' : 'https://';
         $dom = str_ireplace('http://', '', $CFG->wwwroot);
         $dom = str_ireplace('https://', '', $dom);
         if (stripos($dom, 'www.example.com') !== false) {
             // Local domain is example domain while testing, so we have to get the info from config.
             $dom = str_ireplace('/moodle', '', $dom);
             $dom = str_ireplace('www.example.com', self::get_hostname(), $dom);
+            // Force https on Github Actions.
+            $http = 'https://';
         }
-        return $this->sandbox ? 'http://' . $dom : 'https://' . $dom;
+        return $http . $dom;
     }
 
     /**
