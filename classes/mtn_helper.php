@@ -183,6 +183,7 @@ class mtn_helper {
         $result = str_ireplace('/moodle', '', $result);
         return $result;
     }
+
     /**
      * Collect a token.
      *

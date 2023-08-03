@@ -45,8 +45,7 @@ jobs:
         if: ${{ matrix.moodle-branch == 'MOODLE_401_STABLE' }}
         uses: actions/checkout@v3
         with:
-          repository: ewallah/moodle-local_aws.git
-          ref: 'main'
+          repository: catalyst/moodle-local_aws
           path: extras/local_aws
 
       - name: setup PHP
