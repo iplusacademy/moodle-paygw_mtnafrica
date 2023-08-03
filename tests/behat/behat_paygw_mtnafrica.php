@@ -73,8 +73,6 @@ class behat_paygw_mtnafrica extends behat_base {
         $config->environment = 'sandbox';
         $config->secret = $secret;
         $config->secret1 = $secret1;
-        $config->secretsb = $secret;
-        $config->secret1sb = $secret1;
         $config->country = 'UG';
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
     }
