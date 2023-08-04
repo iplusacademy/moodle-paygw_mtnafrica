@@ -97,9 +97,11 @@ class mtn_helper {
         require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
         $this->guzzle = new \GuzzleHttp\Client();
         $this->sandbox = (strtolower($config['environment']) == 'sandbox');
+        $this->clientid = $config['clientid'];
+        $this->secret = $config['secret'];
+        $this->secret1 = $config['secret1'];
         if ($this->sandbox) {
             $this->clientid = self::gen_uuid4();
-            $this->secret1 = $config['secret1sb'];
             $this->baseurl = 'https://sandbox.momodeveloper.mtn.com/';
             // We try to create a new user.
             $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
@@ -112,10 +114,6 @@ class mtn_helper {
             // We collect a apikey.
             $result = $this->request_post('v1_0/apiuser/' . $this->clientid . '/apikey', [], $headers);
             $this->secret = self::array_helper('apiKey', $result) ?? $this->secret;
-        } else {
-            $this->clientid = $config['clientid'];
-            $this->secret = $config['secret'];
-            $this->secret1 = $config['secretsb'];
         }
         $this->country = self::array_helper('country', $config) ?? $country;
     }
