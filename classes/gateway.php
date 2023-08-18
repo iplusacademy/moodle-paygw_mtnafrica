@@ -87,7 +87,7 @@ class gateway extends \core_payment\gateway {
      * @param \core_payment\form\account_gateway $form
      */
     public static function add_configuration_to_gateway_form(\core_payment\form\account_gateway $form): void {
-        $arr = ['brandname', 'clientid', 'secret', 'secret1', 'live', 'sandbox', 'environment', 'country'];
+        $arr = ['brandname', 'clientid', 'apikey', 'secret', 'secret1', 'live', 'sandbox', 'environment', 'country'];
         $strs = get_strings($arr, 'paygw_mtnafrica');
         $mform = $form->get_mform();
 
@@ -98,6 +98,10 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('text', 'clientid', $strs->clientid);
         $mform->setType('clientid', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('clientid', 'clientid', 'paygw_mtnafrica');
+
+        $mform->addElement('passwordunmask', 'apikey', $strs->apikey);
+        $mform->setType('apikey', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('apikey', 'apikey', 'paygw_mtnafrica');
 
         $mform->addElement('passwordunmask', 'secret', $strs->secret);
         $mform->setType('secret', PARAM_RAW_TRIMMED);
@@ -115,9 +119,10 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('select', 'environment', $strs->environment, $options);
         $mform->addHelpButton('environment', 'environment', 'paygw_mtnafrica');
 
-        $mform->addRule('clientid', get_string('required'), 'required', null, 'client');
-        $mform->addRule('secret', get_string('required'), 'required', null, 'client');
-        $mform->addRule('secret1', get_string('required'), 'required', null, 'client');
+        $mform->addRule('clientid', get_string('required'), 'required');
+        $mform->addRule('apikey', get_string('required'), 'required');
+        $mform->addRule('secret', get_string('required'), 'required');
+        $mform->addRule('secret1', get_string('required'), 'required');
     }
 
     /**
@@ -130,7 +135,7 @@ class gateway extends \core_payment\gateway {
      */
     public static function validate_gateway_form(
         \core_payment\form\account_gateway $form, \stdClass $data, array $files, array &$errors): void {
-        $vals = empty($data->clientid) || empty($data->secret) || empty($data->secret1);
+        $vals = empty($data->clientid) || empty($data->apikey) || empty($data->secret) || empty($data->secret1);
         if ($data->enabled && $vals) {
             $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');
         }

@@ -71,6 +71,7 @@ class behat_paygw_mtnafrica extends behat_base {
         $config->clientid = 'fakelogin';
         $config->brandname = 'maul';
         $config->environment = 'sandbox';
+        $config->apikey = 'fakeapi';
         $config->secret = $secret;
         $config->secret1 = $secret1;
         $config->country = 'UG';

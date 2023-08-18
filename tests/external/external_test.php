@@ -67,6 +67,7 @@ class external_test extends \advanced_testcase {
         $config->clientid = $this->login;
         $config->brandname = 'maul';
         $config->environment = 'sandbox';
+        $config->apikey = 'fakeapikey';
         $config->secret = $secret;
         $config->secret1 = $secret1;
         $config->country = 'UG';

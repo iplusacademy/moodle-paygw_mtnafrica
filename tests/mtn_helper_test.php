@@ -52,6 +52,7 @@ class mtn_helper_test extends \advanced_testcase {
             'brandname' => 'maul',
             'environment' => 'sandbox',
             'clientid' => 'fakelogin',
+            'apikey' => 'fakeapikey',
             'secret' => $secret,
             'secret1' => $secret1];
         $DB->set_field('payment_gateways', 'config', json_encode($this->config), []);

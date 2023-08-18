@@ -10,10 +10,13 @@ Feature: MTN Africa payment gateway
       | student1 | 46733123454 | UG      |
       | student2 | 46733123453 | UG      |
       | manager1 | 46733123452 | UG      |
+    And the following "categories" exist:
+      | name         | idnumber |
+      | paid courses | payment  |
     And the following "courses" exist:
-      | fullname | shortname |
-      | Course 1 | C1        |
-      | Course 2 | C2        |
+      | fullname | shortname | category |
+      | Course 1 | C1        | payment  |
+      | Course 2 | C2        | payment  |
     And the following "activities" exist:
       | activity | name     | course | idnumber |
       | page     | TestPage | C1     | page1    |
@@ -40,6 +43,7 @@ Feature: MTN Africa payment gateway
   Scenario: Student can cancel MTN Africa payment
     Given I log in as "student1"
     And I am on course index
+    And I follow "paid courses"
     And I follow "Course 1"
     When I should see "This course requires a payment for entry."
     And I press "Select payment type"
@@ -52,6 +56,7 @@ Feature: MTN Africa payment gateway
   Scenario: Student can see the MTN Africa payment prompt on the course enrolment page
     Given I log in as "student1"
     And I am on course index
+    And I follow "paid courses"
     When I follow "Course 1"
     Then I should see "This course requires a payment for entry."
     And I should see "50"
@@ -69,6 +74,7 @@ Feature: MTN Africa payment gateway
   Scenario: Student is enrolled in course after an MTN Africa payment
     When I log in as "student1"
     And I am on course index
+    And I follow "paid courses"
     And I follow "Course 1"
     Then I should see "This course requires a payment for entry."
     And I should see "50"
@@ -91,6 +97,7 @@ Feature: MTN Africa payment gateway
   Scenario: Student should be logged in automatically after an MTN Africa payment
     Given I log in as "student2"
     And I am on course index
+    And I follow "paid courses"
     When I follow "Course 1"
     Then I should see "This course requires a payment for entry."
     And I should see "50"
@@ -108,6 +115,7 @@ Feature: MTN Africa payment gateway
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page with round price
     Given I log in as "guest"
     And I am on course index
+    And I follow "paid courses"
     When I follow "Course 1"
     Then I should see "This course requires a payment for entry."
     And I should see "50"
@@ -116,6 +124,7 @@ Feature: MTN Africa payment gateway
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page
     Given I log in as "guest"
     And I am on course index
+    And I follow "paid courses"
     When I follow "Course 2"
     Then I should see "This course requires a payment for entry."
     And I should see "5,000.00"

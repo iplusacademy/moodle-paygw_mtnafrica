@@ -23,11 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['mtnstart'] = 'We sent you a request for payment.</br>
-Please complete the payment using your cell phone.</br>
-You have 3 minutes to complete this transaction.</br>
-The moment we receive a confirmation by MTN Africa, you will be able to access the course.';
 $string['amountmismatch'] = 'The amount you attempted to pay does not match the required fee. Your account has not been debited.';
+$string['apikey'] = 'API key';
+$string['apikey_help'] = 'API key, found on the local money portal.';
 $string['authorising'] = 'Authorising the payment. Please wait...';
 $string['brandname'] = 'Brand name';
 $string['brandname_help'] = 'An optional label that overrides the business name for the your account on the MTN Africa site.';
@@ -47,6 +45,10 @@ $string['gatewaydescription'] = 'MTN Africa is an authorised payment gateway pro
 $string['gatewayname'] = 'MTN Africa';
 $string['internalerror'] = 'An internal error has occurred. Please contact us.';
 $string['live'] = 'Live';
+$string['mtnstart'] = 'We sent you a request for payment.</br>
+Please complete the payment using your cell phone.</br>
+You have 3 minutes to complete this transaction.</br>
+The moment we receive a confirmation by MTN Africa, you will be able to access the course.';
 $string['paymentnotcleared'] = 'payment not cleared by MTN Africa.';
 $string['pluginname'] = 'MTN Africa';
 $string['pluginname_desc'] = 'The MTN Africa plugin allows you to receive payments via MTN Africa.';

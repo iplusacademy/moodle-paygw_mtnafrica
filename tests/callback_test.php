@@ -38,6 +38,8 @@ class callback_test extends \advanced_testcase {
     /** @var \core_payment\account account */
     private $account;
 
+    /** @var config configuration */
+    private $config;
     /**
      * Setup function.
      */
@@ -46,6 +48,15 @@ class callback_test extends \advanced_testcase {
         set_config('country', 'UG');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
         $this->account = $generator->create_payment_account(['gateways' => 'mtnafrica']);
+        $secret = getenv('secret', true) ?: getenv('secret');
+        $secret1 = getenv('secret1', true) ?: getenv('secret1');
+        $this->config = [
+            'brandname' => 'maul',
+            'environment' => 'sandbox',
+            'clientid' => 'fakelogin',
+            'apikey' => 'fakeapikey',
+            'secret' => $secret,
+            'secret1' => $secret1];
     }
 
     /**
@@ -53,7 +64,9 @@ class callback_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\mtn_helper
      */
     public function test_callback() {
-        // TODO: we should use an external server to test out the callback.
+        if ($this->config['secret'] == '') {
+            $this->markTestSkipped('No login credentials');
+        }
         $location = \paygw_mtnafrica\mtn_helper::get_hostname();
         $location .= '/payment/gateway/mtnafrica/callback.php';
         $data = ['financialTransactionId' => 2026118745,
@@ -87,6 +100,9 @@ class callback_test extends \advanced_testcase {
      * @coversNothing
      */
     public function test_continue() {
+        if ($this->config['secret'] == '') {
+            $this->markTestSkipped('No login credentials');
+        }
         $client = new \GuzzleHttp\Client();
         $data = ['sesskey' => sesskey(),
             'component' => 'enrol_fee',

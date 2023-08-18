@@ -56,6 +56,11 @@ class mtn_helper {
     public $clientid;
 
     /**
+     * @var string apikey
+     */
+    public $apikey;
+
+    /**
      * @var string MTN Africa Apikey
      */
     private $secret;
@@ -98,6 +103,7 @@ class mtn_helper {
         $this->guzzle = new \GuzzleHttp\Client();
         $this->sandbox = (strtolower($config['environment']) == 'sandbox');
         $this->clientid = $config['clientid'];
+        $this->apikey = $config['apikey'];
         $this->secret = $config['secret'];
         $this->secret1 = $config['secret1'];
         if ($this->sandbox) {
@@ -113,7 +119,7 @@ class mtn_helper {
             $this->request_post('v1_0/apiuser/' . $this->clientid, [], $headers, 'GET');
             // We collect a apikey.
             $result = $this->request_post('v1_0/apiuser/' . $this->clientid . '/apikey', [], $headers);
-            $this->secret = self::array_helper('apiKey', $result) ?? $this->secret;
+            $this->apikey = self::array_helper('apiKey', $result) ?? $this->apikey;
         }
         $this->country = self::array_helper('country', $config) ?? $country;
     }
@@ -213,7 +219,7 @@ class mtn_helper {
     private function get_basic_auth(): array {
         return $this->add_xxx_protection([
             'Ocp-Apim-Subscription-Key' => $this->secret1,
-            'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->secret)]);
+            'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->apikey)]);
     }
 
     /**
