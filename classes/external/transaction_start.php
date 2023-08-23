@@ -23,16 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// TODO: Uncomment.
-// declare(strict_types=1);.
+declare(strict_types=1);.
 
 namespace paygw_mtnafrica\external;
 
 use core_payment\helper;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 use paygw_mtnafrica\mtn_helper;
 
 /**
