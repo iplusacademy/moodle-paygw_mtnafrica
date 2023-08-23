@@ -42,8 +42,8 @@ To set up access within Moodle you will need to:
 
 ## Dependencies
 
-* Currently this plugin is using the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
-* From Moodle_402_STABLE on this will not be necessary any more as Guzzle will be part of Moodle.
+* MOODLE_401_STABLE needs the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
+* MOODLE_402_STABLE+ relies on Guzzle (already a part of Moodle).
 
 ## Configure Moodle
 

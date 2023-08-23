@@ -99,7 +99,9 @@ class mtn_helper {
      */
     public function __construct(array $config, string $country = 'UG') {
         global $CFG;
-        require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
+        if ($CFG->version < 2023042400) {
+            require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
+        }
         $this->guzzle = new \GuzzleHttp\Client();
         $this->sandbox = (strtolower($config['environment']) == 'sandbox');
         $this->clientid = $config['clientid'];
