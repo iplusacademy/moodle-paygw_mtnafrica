@@ -27,12 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->requires = 2022041200;
 $plugin->component = 'paygw_mtnafrica';
-global $CFG;
-if ($CFG->version < 2023042400) {
-    $plugin->dependencies = ['enrol_fee' => ANY_VERSION, 'local_aws' => ANY_VERSION];
-} else {
-    $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-}
 $plugin->maturity = MATURITY_RC;
 $plugin->supported = [401, 403];
 $plugin->release = 'v4.0.3';
