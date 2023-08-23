@@ -81,8 +81,8 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
     public function test_config_for_js() {
-        $this->assertInstanceOf('external_function_parameters', get_config_for_js::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', get_config_for_js::execute_returns());
+        $this->assertInstanceOf('core_external\external_function_parameters', get_config_for_js::execute_parameters());
+        $this->assertInstanceOf('core_external\external_single_structure', get_config_for_js::execute_returns());
     }
 
     /**
@@ -102,8 +102,8 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_start
      */
     public function test_transaction_start() {
-        $this->assertInstanceOf('external_function_parameters', transaction_start::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_start::execute_returns());
+        $this->assertInstanceOf('core_external\external_function_parameters', transaction_start::execute_parameters());
+        $this->assertInstanceOf('core_external\external_single_structure', transaction_start::execute_returns());
     }
 
     /**
@@ -124,8 +124,8 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_transaction_complete() {
-        $this->assertInstanceOf('external_function_parameters', transaction_complete::execute_parameters());
-        $this->assertInstanceOf('external_single_structure', transaction_complete::execute_returns());
+        $this->assertInstanceOf('core_external\external_function_parameters', transaction_complete::execute_parameters());
+        $this->assertInstanceOf('core_external\external_single_structure', transaction_complete::execute_returns());
     }
 
     /**
