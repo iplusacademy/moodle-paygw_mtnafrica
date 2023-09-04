@@ -170,7 +170,7 @@ class mtn_helper_test extends \advanced_testcase {
             'Timeout' => ['46733123452', 'failed', 'EXPIRED'],
             'Ongoing' => ['46733123453', 'pending'],
             'Pending' => ['46733123454', 'pending'],
-            'Succes' => ['46733123999', 'successful', 'SUCCESSFUL'],
+            'Succes' => ['56733123999', 'successful', 'SUCCESSFUL'],
         ];
     }
 
