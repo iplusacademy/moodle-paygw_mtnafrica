@@ -40,6 +40,10 @@ To set up access within Moodle you will need to:
 * Make a phone call to your local MTN representative so your submitted resquest is accepted, yes, somebody at MTN Africa needs to turn a switch before your changes take effect.
 * For every change, callback url, enable extra APIs, ... see previous line. 
 
+## Install
+
+Install from the Moodle plugins database or unzip the code into the payment/gateway/mtnafirca folder.
+
 ## Dependencies
 
 * MOODLE_401_STABLE needs the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
