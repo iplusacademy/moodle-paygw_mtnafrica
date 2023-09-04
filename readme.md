@@ -42,7 +42,11 @@ To set up access within Moodle you will need to:
 
 ## Install
 
-Install from the Moodle plugins database or unzip the code into the payment/gateway/mtnafirca folder.
+You can install this plugin from the plugin directory or get the latest version on GitHub.
+
+```bash
+git clone https://github.com/iplusacademy/moodle-paygw_mtnafrica.git payment/gateway/mtnafrica
+```
 
 ## Dependencies
 
@@ -91,14 +95,18 @@ you will be able to see the payment process completely, and after some waiting b
 
 This plugin can also be tested in PHPUnit and Behat, but you need to add your login - secret - secret1 keys as an environment variable.
 
+```bash
 * env login=???? secret=???? secret1=???? vendor/bin/phpunit --coverage-text payment/gateway/airtelafrica/
 * env login=???? secret=???? secret1=???? vendor/bin/behat --tags='paygw_airtelafrica'
+```
 
 Or you can use secrets in Github actions:
 
+```bash
 * gh secret set login -b"?????"
 * gh secret set secret -b"?????"
 * gh secret set secret1 -b"?????"
+```
 
 ## Plugin repositories
 
