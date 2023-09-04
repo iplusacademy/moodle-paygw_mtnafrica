@@ -130,7 +130,7 @@ jobs:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile=firefox || true
+        run: moodle-plugin-ci --ansi behat --profile firefox || true
 
       - name: behat chrome
         if: ${{ always() }}
@@ -138,7 +138,7 @@ jobs:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile=chrome || true
+        run: moodle-plugin-ci --ansi behat --profile chrome || true
 
       - name: behat edge
         if: ${{ always() }}
@@ -146,4 +146,4 @@ jobs:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile=edge || true
+        run: moodle-plugin-ci --ansi behat --profile edge || true
