@@ -53,6 +53,8 @@ jobs:
           ini-values: max_input_vars=5000
           coverage: pcov
 
+      - uses: browser-actions/setup-edge@v1
+
       - name: composer
         run: |
            composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
@@ -122,10 +124,26 @@ jobs:
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: behat
+      - name: behat firefox
+        if: ${{ always() }}
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi behat --profile=firefox || true
+
+      - name: behat chrome
         if: ${{ always() }}
         env:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
         run: moodle-plugin-ci --ansi behat --profile=chrome || true
+
+      - name: behat edge
+        if: ${{ always() }}
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi behat --profile=edge || true

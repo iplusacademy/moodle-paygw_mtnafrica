@@ -8,7 +8,7 @@ Feature: MTN Africa payment gateway
     Given the following "users" exist:
       | username | phone2      | country |
       | student1 | 46733123454 | UG      |
-      | student2 | 46733123453 | UG      |
+      | student2 | 56733123999 | UG      |
       | manager1 | 46733123452 | UG      |
     And the following "categories" exist:
       | name         | idnumber |
@@ -44,13 +44,13 @@ Feature: MTN Africa payment gateway
     Given I log in as "student1"
     And I am on course index
     And I follow "paid courses"
-    And I follow "Course 1"
-    When I should see "This course requires a payment for entry."
+    When I follow "Course 1"
+    Then I should see "This course requires a payment for entry."
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
     And I click on "Close" "button" in the "MTN Africa" "dialogue"
-    Then I should see "MTN Africa" in the "Select payment type" "dialogue"
+    And I should see "MTN Africa" in the "Select payment type" "dialogue"
 
   @javascript
   Scenario: Student can see the MTN Africa payment prompt on the course enrolment page
@@ -72,26 +72,26 @@ Feature: MTN Africa payment gateway
 
   @javascript
   Scenario: Student is enrolled in course after an MTN Africa payment
-    When I log in as "student1"
+    Given I log in as "student2"
     And I am on course index
     And I follow "paid courses"
-    And I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    When I follow "Course 1"
+    And I should see "This course requires a payment for entry."
     And I should see "50"
-    When I press "Select payment type"
+    And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
     And I should see "50"
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should not see "789012"
+    And I should see "56733123999"
     And I should see "profile page"
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     And I wait until the page is ready
     # We are in.
-    # Then I should see "Course 1"
-    # And I should see "TestPage"
+    Then I should see "Course 1"
+    And I should see "TestPage"
 
   @javascript
   Scenario: Student should be logged in automatically after an MTN Africa payment
@@ -110,7 +110,7 @@ Feature: MTN Africa payment gateway
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     # Here we cannot see something as the page is not yet ready.
-    # And I should see "TestPage"
+    And I should see "TestPage"
 
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page with round price
     Given I log in as "guest"
