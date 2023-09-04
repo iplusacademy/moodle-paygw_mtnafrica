@@ -124,13 +124,13 @@ jobs:
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: behat firefox
+      - name: firefox
         if: ${{ always() }}
         env:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile firefox || true
+        run: moodle-plugin-ci --ansi behat || true
 
       - name: behat chrome
         if: ${{ always() }}
@@ -139,11 +139,3 @@ jobs:
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
         run: moodle-plugin-ci --ansi behat --profile chrome || true
-
-      - name: behat edge
-        if: ${{ always() }}
-        env:
-            login: ${{ secrets.login }}
-            secret: ${{ secrets.secret }}
-            secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile edge || true
