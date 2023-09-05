@@ -167,27 +167,16 @@ class mtn_helper {
     public static function get_hostname(): string {
         $lines = file('config.php');
         $needle = '$CFG->wwwroot';
+        $arr = [$needle, '/moodle', ' ', ';', '=', '"', "'", 'http://', 'https://', PHP_EOL];
         $result = '127.0.0.1';
         foreach ($lines as $line) {
             if (stripos($line, $needle) !== false) {
-                $line = str_ireplace($needle, '', $line);
-                $line = str_ireplace(' ', '', $line);
-                $line = str_ireplace(PHP_EOL, '', $line);
-                $line = str_ireplace(';', '', $line);
-                $line = str_ireplace('=', '', $line);
-                $line = str_ireplace('"', '', $line);
-                $line = str_ireplace("'", '', $line);
-                $line = str_ireplace('http://', '', $line);
-                $line = str_ireplace('https://', '', $line);
-                $result = strip_tags($line);
+                $result = strip_tags(str_ireplace($arr, '', $line));
                 break;
             }
         }
         // Localhost callbacks are redirected.
-        $result = str_ireplace('localhost', 'test.medical-access.org', $result);
-        $result = str_ireplace('127.0.0.1', 'test.medical-access.org', $result);
-        $result = str_ireplace('/moodle', '', $result);
-        return $result;
+        return str_ireplace(['localhost', '127.0.0.1'], 'test.medical-access.org', $result);
     }
 
     /**

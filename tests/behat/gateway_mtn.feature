@@ -109,7 +109,7 @@ Feature: MTN Africa payment gateway
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
-    # Here we cannot see something as the page is not yet ready.
+    # We are in.
     And I should see "TestPage"
 
   Scenario: Guest can see the login prompt on the MTN Africa course enrolment page with round price

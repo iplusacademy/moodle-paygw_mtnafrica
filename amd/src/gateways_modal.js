@@ -108,6 +108,7 @@ export const process = (component, paymentArea, itemId, description) => {
                 payButton.on('click', function() {
                     modal.destroy();
                 });
+                payButton.attr('disabled',  '');
                 console.log('mtn Africa payment process started');  // eslint-disable-line
                 console.log('Reference id: ' + transId);  // eslint-disable-line
                 var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -139,6 +140,7 @@ export const process = (component, paymentArea, itemId, description) => {
                                                 spinnerDiv.attr('style', 'display: none;');
                                                 var cancelButton = modal.getRoot().find('#mtn-cancel');
                                                 cancelButton.attr('style', 'display: none;');
+                                                payButton.removeAttr('disabled');
                                                 modal.setFooter('Transaction '+ transId + ' Succes');
                                                 payButton.on('click', function() {
                                                     const loc = window.location.href;
