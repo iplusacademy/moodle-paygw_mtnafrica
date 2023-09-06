@@ -98,10 +98,6 @@ class mtn_helper {
      * @param string $country MTN Africa location.
      */
     public function __construct(array $config, string $country = 'UG') {
-        global $CFG;
-        if ($CFG->version < 2023042400) {
-            require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
-        }
         $this->guzzle = new \GuzzleHttp\Client();
         $this->sandbox = (strtolower($config['environment']) == 'sandbox');
         $this->clientid = $config['clientid'];
