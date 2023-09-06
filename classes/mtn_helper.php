@@ -43,7 +43,7 @@ class mtn_helper {
     /**
      * @var string The base API URL
      */
-    public string $baseurl = 'https://api.mtn.com/';
+    public string $baseurl = 'https://proxy.momoapi.mtn.com/';
 
     /**
      * @var bool Are we working in sandbox
