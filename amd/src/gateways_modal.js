@@ -71,7 +71,6 @@ export const process = (component, paymentArea, itemId, description) => {
             console.log('Destroy modal');  // eslint-disable-line
             modal.destroy();
         });
-
         return Promise.all([modal, mtnConfig]);
     })
     .then(([modal, mtnConfig]) => {
@@ -140,6 +139,7 @@ export const process = (component, paymentArea, itemId, description) => {
                                                 spinnerDiv.attr('style', 'display: none;');
                                                 var cancelButton = modal.getRoot().find('#mtn-cancel');
                                                 cancelButton.attr('style', 'display: none;');
+                                                var payButton = modal.getRoot().find('#mtn-pay');
                                                 payButton.removeAttr('disabled');
                                                 modal.setFooter('Transaction '+ transId + ' Succes');
                                                 payButton.on('click', function() {

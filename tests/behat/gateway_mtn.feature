@@ -8,7 +8,7 @@ Feature: MTN Africa payment gateway
     Given the following "users" exist:
       | username | phone2      | country |
       | student1 | 46733123454 | UG      |
-      | student2 | 56733123999 | UG      |
+      | student2 | 46733123999 | UG      |
       | manager1 | 46733123452 | UG      |
     And the following "categories" exist:
       | name         | idnumber |
@@ -81,10 +81,10 @@ Feature: MTN Africa payment gateway
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
     And I should see "50"
-    And I wait until the page is ready
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
-    And I should see "56733123999"
+    And I should see "46733123999"
     And I should see "profile page"
+    And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
@@ -106,6 +106,7 @@ Feature: MTN Africa payment gateway
     And I should see "50"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
     And I should see "46733123"
+    And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"
     And I wait until the page is ready
     And I click on "Proceed" "button" in the "MTN Africa" "dialogue"

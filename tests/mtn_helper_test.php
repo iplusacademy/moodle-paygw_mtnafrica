@@ -183,7 +183,7 @@ class mtn_helper_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
-        $phone = '46733123999';
+        $phone = '56733123999';
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
