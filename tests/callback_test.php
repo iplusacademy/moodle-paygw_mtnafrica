@@ -56,7 +56,8 @@ class callback_test extends \advanced_testcase {
             'clientid' => 'fakelogin',
             'apikey' => 'fakeapikey',
             'secret' => $secret,
-            'secret1' => $secret1];
+            'secret1' => $secret1,
+        ];
     }
 
     /**
@@ -69,14 +70,16 @@ class callback_test extends \advanced_testcase {
         }
         $location = \paygw_mtnafrica\mtn_helper::get_hostname();
         $location .= '/payment/gateway/mtnafrica/callback.php';
-        $data = ['financialTransactionId' => 2026118745,
-                'externalId' => 2362616710,
-                'amount' => 100,
-                'currency' => 'EUR',
-                'payer' => ['partyIdType' => 'MSISDN', 'partyId' => '1234567'],
-                'payerMessage' => 'Thanks for your payment',
-                'payeeNote' => 'enrol_fee-fee-13-4',
-                'status' => 'SUCCESSFUL'];
+        $data = [
+            'financialTransactionId' => 2026118745,
+            'externalId' => 2362616710,
+            'amount' => 100,
+            'currency' => 'EUR',
+            'payer' => ['partyIdType' => 'MSISDN', 'partyId' => '1234567'],
+            'payerMessage' => 'Thanks for your payment',
+            'payeeNote' => 'enrol_fee-fee-13-4',
+            'status' => 'SUCCESSFUL',
+        ];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_PROXY, $location);
@@ -104,12 +107,14 @@ class callback_test extends \advanced_testcase {
             $this->markTestSkipped('No login credentials');
         }
         $client = new \GuzzleHttp\Client();
-        $data = ['sesskey' => sesskey(),
+        $data = [
+            'sesskey' => sesskey(),
             'component' => 'enrol_fee',
             'paymentarea' => 'fee',
             'itemid' => 82,
             'transactionid' => '4871171159',
-            'reference' => 'course33333'];
+            'reference' => 'course33333',
+        ];
         $location = \paygw_mtnafrica\mtn_helper::get_hostname();
         $location .= '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);

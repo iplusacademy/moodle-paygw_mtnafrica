@@ -203,8 +203,8 @@ class external_test extends \advanced_testcase {
                 'currentcy' => 'EUR',
                 'amount' => 66,
                 'orderId' => 20,
-                'paymentId' => 333
-            ]
+                'paymentId' => 333,
+            ],
         ];
         $event = \paygw_mtnafrica\event\request_log::create($arr);
         $event->trigger();
@@ -233,7 +233,7 @@ class external_test extends \advanced_testcase {
         $paymentid = $paygen->create_payment([
             'accountid' => $account->get('id'),
             'amount' => 10,
-            'userid' => $user->id
+            'userid' => $user->id,
         ]);
         $payable = \enrol_fee\payment\service_provider::get_payable('fee', $this->feeid);
         $this->assertEquals($account->get('id'), $payable->get_account_id());

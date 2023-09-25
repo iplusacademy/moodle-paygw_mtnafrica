@@ -26,14 +26,8 @@
 namespace paygw_mtnafrica\privacy;
 
 use core_payment\privacy\paygw_provider;
-use core_privacy\local\request\writer;
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\contextlist;
-use core_privacy\local\request\core_userlist_provider;
-use core_privacy\local\request\approved_userlist;
-use core_privacy\local\request\userlist;
-use core_privacy\local\request\transform;
-use core_privacy\local\request\deletion_criteria;
+use core_privacy\local\request\{writer, approved_contextlist, contextlist, core_userlist_provider, approved_userlist};
+use core_privacy\local\request\{userlist, transform, deletion_criteria};
 use core_privacy\local\metadata\collection;
 
 /**
@@ -62,7 +56,8 @@ class provider implements \core_privacy\local\metadata\provider,
             'paymentid' => 'privacy:metadata:paygw_mtnafrica:paymentid',
             'moneyid' => 'privacy:metadata:paygw_mtnafrica:moneyid',
             'timecreated' => 'privacy:metadata:paygw_mtnafrica:timecreated',
-            'timecompleted' => 'privacy:metadata:paygw_mtnafrica:timecompleted'];
+            'timecompleted' => 'privacy:metadata:paygw_mtnafrica:timecompleted',
+        ];
         $collection->add_database_table('paygw_mtnafrica', $arr, 'privacy:metadata:paygw_mtnafrica');
         return $collection;
     }

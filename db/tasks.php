@@ -25,12 +25,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = [[
-    'classname' => '\paygw_mtnafrica\task\clean_up',
-    'blocking' => 0,
-    'minute' => '44',
-    'hour' => '02',
-    'day' => '*',
-    'month' => '*',
-    'dayofweek' => '*',
-    'disabled' => 0]];
+$tasks = [
+    [
+        'classname' => '\paygw_mtnafrica\task\clean_up',
+        'blocking' => 0,
+        'minute' => '44',
+        'hour' => '02',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+    ],
+];

@@ -114,7 +114,7 @@ class transaction_start extends external_api {
         return new external_function_parameters([
             'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
             'reference' => new external_value(PARAM_RAW, 'A reference'),
-            'message' => new external_value(PARAM_RAW, 'Usualy the error message')
+            'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
         ]);
     }
 }

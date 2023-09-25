@@ -25,7 +25,7 @@
 
 namespace paygw_mtnafrica\check;
 
-use \core\check\{check, result};
+use core\check\{check, result};
 
 /**
  * Checks.
