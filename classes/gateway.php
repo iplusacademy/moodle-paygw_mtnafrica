@@ -43,7 +43,7 @@ class gateway extends \core_payment\gateway {
     public static function get_country_currencies(): array {
         return ['BJ' => 'XOF', 'CM' => 'XAF', 'TD' => 'XAF', 'CG' => 'XAF', 'CD' => 'CDF', 'GH' => 'GHS', 'GN' => 'GNF',
                 'CI' => 'XOF', 'LR' => 'LRD', 'NE' => 'XOF', 'RW' => 'RWF', 'ZA' => 'ZAR', 'UG' => 'UGX', 'ZM' => 'ZMW',
-                'sandbox' => 'EUR'];
+                'sandbox' => 'EUR', ];
     }
 
     /**

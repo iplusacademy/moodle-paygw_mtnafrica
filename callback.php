@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 $eventargs = [
                     'context' => \context_course::instance($courseid),
                     'userid' => $payrec->userid,
-                    'other' => ['message' => $rmessage, 'id' => $transactionid, 'mtn_money_id' => $rtransid]];
+                    'other' => ['message' => $rmessage, 'id' => $transactionid, 'mtn_money_id' => $rtransid], ];
                 \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
                 $conf = \core_payment\helper::get_gateway_configuration($exp[0], $exp[1], $payrec->paymentid, $gateway);
                 $helper = new \paygw_mtnafrica\mtn_helper($conf);

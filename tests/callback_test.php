@@ -56,7 +56,7 @@ class callback_test extends \advanced_testcase {
             'clientid' => 'fakelogin',
             'apikey' => 'fakeapikey',
             'secret' => $secret,
-            'secret1' => $secret1];
+            'secret1' => $secret1, ];
     }
 
     /**
@@ -76,7 +76,7 @@ class callback_test extends \advanced_testcase {
                 'payer' => ['partyIdType' => 'MSISDN', 'partyId' => '1234567'],
                 'payerMessage' => 'Thanks for your payment',
                 'payeeNote' => 'enrol_fee-fee-13-4',
-                'status' => 'SUCCESSFUL'];
+                'status' => 'SUCCESSFUL', ];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_PROXY, $location);
@@ -109,7 +109,7 @@ class callback_test extends \advanced_testcase {
             'paymentarea' => 'fee',
             'itemid' => 82,
             'transactionid' => '4871171159',
-            'reference' => 'course33333'];
+            'reference' => 'course33333', ];
         $location = \paygw_mtnafrica\mtn_helper::get_hostname();
         $location .= '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);

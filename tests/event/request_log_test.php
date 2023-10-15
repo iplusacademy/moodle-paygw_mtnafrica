@@ -44,7 +44,7 @@ class request_log_test extends \advanced_testcase {
         $eventarray = [
             'context' => \context_system::instance(),
             'relateduserid' => 2,
-            'other' => ['token' => 'faketoken', 'transaction' => ['id' => 'fakeid']]];
+            'other' => ['token' => 'faketoken', 'transaction' => ['id' => 'fakeid']], ];
         $event = request_log::create($eventarray);
         $event->trigger();
         $event->get_name();

@@ -62,7 +62,7 @@ class provider implements \core_privacy\local\metadata\provider,
             'paymentid' => 'privacy:metadata:paygw_mtnafrica:paymentid',
             'moneyid' => 'privacy:metadata:paygw_mtnafrica:moneyid',
             'timecreated' => 'privacy:metadata:paygw_mtnafrica:timecreated',
-            'timecompleted' => 'privacy:metadata:paygw_mtnafrica:timecompleted'];
+            'timecompleted' => 'privacy:metadata:paygw_mtnafrica:timecompleted', ];
         $collection->add_database_table('paygw_mtnafrica', $arr, 'privacy:metadata:paygw_mtnafrica');
         return $collection;
     }

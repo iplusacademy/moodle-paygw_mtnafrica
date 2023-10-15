@@ -219,7 +219,7 @@ class mtn_helper {
     private function get_basic_auth(): array {
         return $this->add_xxx_protection([
             'Ocp-Apim-Subscription-Key' => $this->secret1,
-            'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->apikey)]);
+            'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->apikey), ]);
     }
 
     /**
@@ -235,7 +235,7 @@ class mtn_helper {
             'X-Callback-Url' => $this->get_callback_host(),
             'X-Reference-Id' => $this->clientid,
             'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-            'Ocp-Apim-Subscription-Key' => $this->secret1]);
+            'Ocp-Apim-Subscription-Key' => $this->secret1, ]);
     }
 
     /**
@@ -262,14 +262,14 @@ class mtn_helper {
                 'Authorization' => 'Bearer ' . $this->get_token(),
                 'X-Reference-Id' => $xref,
                 'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-                'Ocp-Apim-Subscription-Key' => $this->secret1];
+                'Ocp-Apim-Subscription-Key' => $this->secret1, ];
             $data = [
                 'amount' => $amount,
                 'currency' => $currency,
                 'externalId' => $transactionid,
                 'payer' => ['partyIdType' => 'MSISDN', 'partyId' => $userphone],
                 'payerMessage' => substr(get_string('thanks', 'paygw_mtnafrica'), 0, 30),
-                'payeeNote' => $reference];
+                'payeeNote' => $reference, ];
             $response = $this->guzzle->request('POST', $location, ['headers' => $headers, 'json' => $data]);
             $code = $response->getStatusCode();
             $other = array_merge(['verb' => 'Post', 'location' => $location, 'answer' => $code], $data);
@@ -294,7 +294,7 @@ class mtn_helper {
         $headers = [
             'Authorization' => 'Bearer ' . $token,
             'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
-            'Ocp-Apim-Subscription-Key' => $this->secret1];
+            'Ocp-Apim-Subscription-Key' => $this->secret1, ];
         return $this->request_post($location, [], $headers, 'GET');
     }
 
@@ -444,7 +444,7 @@ class mtn_helper {
             202 => 'Accepted',
             400 => 'Bad Request',
             409 => 'Conflict, duplicated reference id',
-            500 => 'Internal Server Error'];
+            500 => 'Internal Server Error', ];
         return self::array_helper($code, $returns) ?? 'Unknown';
     }
 
@@ -465,7 +465,7 @@ class mtn_helper {
             'SZ' => 'mtnswaziland',
             'GN' => 'mtnguineaconakry',
             'ZA' => 'mtnsouthafrica',
-            'LR' => 'mtnliberia'];
+            'LR' => 'mtnliberia', ];
         return self::array_helper($code, $returns) ?? 'sandbox';
     }
 
