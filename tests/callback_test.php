@@ -64,7 +64,7 @@ class callback_test extends \advanced_testcase {
      * Test callback
      * @covers \paygw_mtnafrica\mtn_helper
      */
-    public function test_callback() {
+    public function test_callback(): void {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
@@ -102,7 +102,7 @@ class callback_test extends \advanced_testcase {
      * Test continue.
      * @coversNothing
      */
-    public function test_continue() {
+    public function test_continue(): void {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }

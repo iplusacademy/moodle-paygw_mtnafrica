@@ -80,7 +80,7 @@ class external_test extends \advanced_testcase {
      * Test external config for js.
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
-    public function test_config_for_js() {
+    public function test_config_for_js(): void {
         $this->assertInstanceOf('core_external\external_function_parameters', get_config_for_js::execute_parameters());
         $this->assertInstanceOf('core_external\external_single_structure', get_config_for_js::execute_returns());
     }
@@ -89,7 +89,7 @@ class external_test extends \advanced_testcase {
      * Test external config for js with credits.
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
-    public function test_config_for_jscredits() {
+    public function test_config_for_jscredits(): void {
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
         }
@@ -101,7 +101,7 @@ class external_test extends \advanced_testcase {
      * Test external transaction_start.
      * @covers \paygw_mtnafrica\external\transaction_start
      */
-    public function test_transaction_start() {
+    public function test_transaction_start(): void {
         $this->assertInstanceOf('core_external\external_function_parameters', transaction_start::execute_parameters());
         $this->assertInstanceOf('core_external\external_single_structure', transaction_start::execute_returns());
     }
@@ -110,7 +110,7 @@ class external_test extends \advanced_testcase {
      * Test external transaction_start with credits.
      * @covers \paygw_mtnafrica\external\transaction_start
      */
-    public function test_transaction_startcredits() {
+    public function test_transaction_startcredits(): void {
         global $USER;
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
@@ -123,7 +123,7 @@ class external_test extends \advanced_testcase {
      * Test external transaction complete.
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
-    public function test_transaction_complete() {
+    public function test_transaction_complete(): void {
         $this->assertInstanceOf('core_external\external_function_parameters', transaction_complete::execute_parameters());
         $this->assertInstanceOf('core_external\external_single_structure', transaction_complete::execute_returns());
     }
@@ -132,7 +132,7 @@ class external_test extends \advanced_testcase {
      * Test external transaction complete with valid credits.
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
-    public function test_transaction_completecredits() {
+    public function test_transaction_completecredits(): void {
         global $USER;
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
@@ -151,7 +151,7 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_start
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
-    public function test_complete_cycle() {
+    public function test_complete_cycle(): void {
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
         }
@@ -187,7 +187,7 @@ class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\event\request_log
      * @covers \paygw_mtnafrica\mtn_helper
      */
-    public function test_request_log() {
+    public function test_request_log(): void {
         global $DB;
         $generator = $this->getDataGenerator();
         $user = $generator->create_user();
@@ -215,7 +215,7 @@ class external_test extends \advanced_testcase {
      * Test payable.
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
-    public function test_payable() {
+    public function test_payable(): void {
         global $CFG;
         if ($this->login == 'fakelogin') {
             $this->markTestSkipped('No login credentials');
@@ -253,7 +253,7 @@ class external_test extends \advanced_testcase {
      * Test inserting record.
      * @covers \paygw_mtnafrica\external\transaction_start
      */
-    public function test_inserting_record() {
+    public function test_inserting_record(): void {
         global $DB;
         $str = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSMjU2In0.eyJjbGllbnRJZCI6IjFmYmFmNmRhLTJjODQtNDc4NC1iOWQ0LTExMzc0MTIzYjllNCIsImV4cGlyZ';
         $str .= '-8-hBKkY1fo8XZpo_qyCP3BBTKi4KOW96_THSbUHn0_t1w2Noq-Xv1z1keCMY6USScv17S0lf8zMxHBg4GouB_ok1BwtiI-4LG6yy4pMQYRbiG4n';

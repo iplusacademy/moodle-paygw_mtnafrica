@@ -39,7 +39,7 @@ class mtnafrica_test extends \advanced_testcase {
      * Test checks.
      * @covers \paygw_mtnafrica\check\mtnafrica
      */
-    public function test_checks() {
+    public function test_checks(): void {
         global $CFG;
         require_once($CFG->dirroot . '/payment/gateway/mtnafrica/lib.php');
         $checks = paygw_mtnafrica_security_checks();

@@ -63,7 +63,7 @@ class mtn_helper_test extends \advanced_testcase {
      * Test MTN Africa helper
      * @covers \paygw_mtnafrica\mtn_helper
      */
-    public function test_empty_helper() {
+    public function test_empty_helper(): void {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
         $this->assertEquals('sandbox', mtn_helper::target_code('BE'));
         $this->assertNotEmpty(mtn_helper::get_hostname());
@@ -74,7 +74,7 @@ class mtn_helper_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\mtn_helper
      * @covers \paygw_mtnafrica\event\request_log
      */
-    public function test_other_helper() {
+    public function test_other_helper(): void {
         global $DB;
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
@@ -180,7 +180,7 @@ class mtn_helper_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\mtn_helper
      * @covers \paygw_mtnafrica\event\request_log
      */
-    public function test_mtn_codes() {
+    public function test_mtn_codes(): void {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }

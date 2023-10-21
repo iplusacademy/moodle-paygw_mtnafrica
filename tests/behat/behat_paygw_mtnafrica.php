@@ -44,7 +44,7 @@ class behat_paygw_mtnafrica extends behat_base {
      * Get the secrets from the environment.
      * @Then I configure mtn
      */
-    public function i_configure_mtn() {
+    public function i_configure_mtn(): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/enrol/locallib.php');
         set_config('country', 'UG');

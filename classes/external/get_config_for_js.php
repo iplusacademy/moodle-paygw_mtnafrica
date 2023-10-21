@@ -31,11 +31,6 @@ use core_payment\helper;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 use paygw_mtnafrica\mtn_helper;
 
-// @codeCoverageIgnoreStart
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/externallib.php');
-// @codeCoverageIgnoreEnd
-
 /**
  * This class collects information about a payment with the MTN Africa payment gateway.
  *

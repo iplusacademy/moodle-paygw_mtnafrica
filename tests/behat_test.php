@@ -51,7 +51,7 @@ class behat_test extends \advanced_testcase {
      * Test callback.
      * @covers \behat_paygw_mtnafrica
      */
-    public function test_behat() {
+    public function test_behat(): void {
         $behat = new \behat_paygw_mtnafrica();
         $behat->i_configure_mtn();
     }

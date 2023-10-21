@@ -79,7 +79,7 @@ class provider_test extends provider_testcase {
      * Test returning metadata.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function test_get_metadata() {
+    public function test_get_metadata(): void {
         $collection = new collection('paygw_mtnafrica');
         $this->assertNotEmpty(provider::get_metadata($collection));
     }
@@ -88,7 +88,7 @@ class provider_test extends provider_testcase {
      * Test for provider.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function test_provider() {
+    public function test_provider(): void {
         global $DB;
         $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
         $context = context_user::instance($this->user->id);
@@ -111,7 +111,7 @@ class provider_test extends provider_testcase {
      * Test for remove.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function test_remove() {
+    public function test_remove(): void {
         global $DB;
         provider::export_payment_data(context_system::instance(), ['course'], $this->payrec);
         $this->assertEmpty(provider::delete_data_for_payment_sql($this->payrec->paymentid, []));
@@ -123,7 +123,7 @@ class provider_test extends provider_testcase {
      * Check the exporting of payments for a user.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function test_export() {
+    public function test_export(): void {
         $context = context_user::instance($this->user->id);
         $this->export_context_data_for_user($this->user->id, $context, 'paygw_mtnafrica');
         $writer = writer::with_context($context);
@@ -135,7 +135,7 @@ class provider_test extends provider_testcase {
      * Tests new functions.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function test_new_functions() {
+    public function test_new_functions(): void {
         $context = context_user::instance($this->user->id);
         $userlist = new userlist($context, 'paygw_mtnafrica');
         provider::get_users_in_context($userlist);
