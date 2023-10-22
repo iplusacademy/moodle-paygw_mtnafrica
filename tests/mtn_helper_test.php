@@ -122,7 +122,7 @@ class mtn_helper_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_complete
      * @dataProvider provide_user_data
      */
-    public function test_with_dataprovider(string $input, string $output, string $reason = '') {
+    public function test_with_dataprovider(string $input, string $output, string $reason = ''): void {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
