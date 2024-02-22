@@ -56,7 +56,7 @@ class provider_test extends provider_testcase {
      * Basic setup for these tests.
      * @covers \paygw_mtnafrica\privacy\provider
      */
-    public function setUp():void {
+    public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
