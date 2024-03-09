@@ -33,7 +33,7 @@ namespace paygw_mtnafrica;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gateway_test extends \advanced_testcase {
+final class gateway_test extends \advanced_testcase {
 
     /** @var \core_payment\account account */
     private $account;

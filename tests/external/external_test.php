@@ -36,7 +36,7 @@ use core_external;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
-class external_test extends \advanced_testcase {
+final class external_test extends \advanced_testcase {
 
     /** @var string phone */
     private $phone = '46733123454';
