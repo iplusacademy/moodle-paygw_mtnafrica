@@ -23,45 +23,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('NO_DEBUG_DISPLAY', true);
-
 // @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../config.php');  // phpcs:ignore
-
-use paygw_mtnafrica\mtn_helper;
-use core_payment\helper;
-
-global $CFG, $DB;
 require_once($CFG->dirroot . '/course/lib.php');
 
-// Keep out casual intruders.
-if (empty($_POST) || !empty($_GET)) {
-    http_response_code(400);
-    throw new moodle_exception('invalidrequest', 'core_error');
-}
+require_login();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // This is a local check if everything went well.
-    require_login();
-    if (!confirm_sesskey()) {
-        redirect($CFG->wwwroot);
-    }
-    $data = new stdClass();
-    foreach ($_POST as $key => $value) {
-        if ($key !== clean_param($key, PARAM_ALPHANUMEXT)) {
-            throw new moodle_exception('invalidrequest', 'core_error', '', null, $key);
-        }
-        if (is_array($value)) {
-            throw new moodle_exception('invalidrequest', 'core_error', '', null, 'Unexpected array param: '.$key);
-        }
-        $data->$key = fix_utf8($value);
-    }
-    $url = new \moodle_url('/');
-    if (property_exists($data, 'itemid') && property_exists($data, 'paymentarea') &&
-        $courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $data->paymentarea, 'id' => $data->itemid])) {
-        $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
-    }
-    redirect($url);
-} else {
-    die();
+$paymentarea = optional_param('paymentarea', null, PARAM_ALPHA);
+$itemid = optional_param('itemid', 0, PARAM_INT);
+$url = new \moodle_url('/');
+if ($courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $paymentarea, 'id' => $itemid])) {
+    $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
 }
+redirect($url);
