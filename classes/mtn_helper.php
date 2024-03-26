@@ -428,15 +428,15 @@ class mtn_helper {
 
     /**
      * Transaction code
-     * @param int $code
+     * @param string $code
      * @return string
      */
-    public static function ta_code(int $code) {
+    public static function ta_code(string $code): string {
         $returns = [
-            202 => 'Accepted',
-            400 => 'Bad Request',
-            409 => 'Conflict, duplicated reference id',
-            500 => 'Internal Server Error',
+            '202' => 'Accepted',
+            '400' => 'Bad Request',
+            '409' => 'Conflict, duplicated reference id',
+            '500' => 'Internal Server Error',
         ];
         return self::array_helper($code, $returns) ?? 'Unknown';
     }
@@ -444,9 +444,9 @@ class mtn_helper {
     /**
      * Return target
      * @param string $code
-     * @return string tartet
+     * @return string target
      */
-    public static function target_code(string $code) {
+    public static function target_code(string $code): string {
         $returns = [
             'UG' => 'mtnuganda',
             'GH' => 'mtnghana',
@@ -463,7 +463,6 @@ class mtn_helper {
         return self::array_helper($code, $returns) ?? 'sandbox';
     }
 
-
     /**
      * Array helper.
      *
@@ -472,6 +471,15 @@ class mtn_helper {
      * @return array||null
      */
     public static function array_helper(string $key, array $arr) {
+        if (is_array($arr) && isset($arr[$key]) && !empty($arr[$key])) {
+            $parameter = $arr[$key];
+            // Cleans parameters to avoid XSS and other issues.
+            if (is_array($parameter)) {
+                return clean_param_array($parameter, PARAM_ALPHANUMEXT, true);
+            }
+            return clean_param($parameter, PARAM_ALPHANUMEXT);
+        }
+        return null;
         return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : null;
     }
 
@@ -480,7 +488,7 @@ class mtn_helper {
      *
      * @return array
      */
-    public function current_user_data() {
+    public function current_user_data(): array {
         global $USER;
         $arr = [];
         $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
