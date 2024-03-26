@@ -106,14 +106,25 @@ final class callback_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+        $gen = $this->getDataGenerator();
+        $course = $gen->create_course();
+
+        $data = [
+            'courseid' => $course->id,
+            'customint1' => $this->account->get('id'),
+            'cost' => 100,
+            'currency' => 'EUR',
+            'roleid' => 5,
+        ];
+        $feeplugin = enrol_get_plugin('fee');
+        $itemid = $feeplugin->add_instance($course, $data);
+
+        $user = $gen->create_and_enrol($course, 'student', ['country' => 'UG', 'phone2' => '123456789'], 'fee');
+        $this->setUser($user);
         $client = new \GuzzleHttp\Client();
         $data = [
-            'sesskey' => sesskey(),
-            'component' => 'enrol_fee',
             'paymentarea' => 'fee',
-            'itemid' => 82,
-            'transactionid' => '4871171159',
-            'reference' => 'course33333',
+            'itemid' => $itemid,
         ];
         $location = \paygw_mtnafrica\mtn_helper::get_hostname();
         $location .= '/payment/gateway/mtnafrica/continue.php';
