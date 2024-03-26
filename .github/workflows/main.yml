@@ -30,11 +30,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        moodle-branch: ['MOODLE_402_STABLE', 'MOODLE_403_STABLE']
-        php: ['8.1']
+        moodle-branch: ['MOODLE_403_STABLE']
+        php: ['8.2']
         database: ['mariadb', 'pgsql']
         include:
-          - php: '8.2'
+          - php: '8.3'
             moodle-branch: 'main'
             database: 'pgsql'
 
@@ -68,10 +68,6 @@ jobs:
       - name: phplint
         if: ${{ always() }}
         run: moodle-plugin-ci --ansi phplint
-
-      - name: phpcpd
-        if: ${{ always() }}
-        run: moodle-plugin-ci --ansi phpcpd
 
       - name: phpmd
         if: ${{ always() }}
@@ -121,18 +117,21 @@ jobs:
         run: vendor/bin/phpunit --colors --no-coverage --testsuite tool_dataprivacy_testsuite,tool_policy_testsuite,core_privacy_testsuite
         working-directory: moodle
 
-      - name: firefox
-        if: ${{ always() }}
-        env:
-            login: ${{ secrets.login }}
-            secret: ${{ secrets.secret }}
-            secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat || true
-
       - name: chrome
         if: ${{ always() }}
+        id: chrome
         env:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
         run: moodle-plugin-ci --ansi behat --profile chrome || true
+
+      - name: failures
+        if: ${{ failure() && steps.chrome.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Behat Faildump (${{ join(matrix.*, ', ') }})
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: ignore
+        
