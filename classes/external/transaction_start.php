@@ -40,7 +40,6 @@ use paygw_mtnafrica\mtn_helper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class transaction_start extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -86,13 +85,13 @@ class transaction_start extends external_api {
         while ($code == 409) {
             $random = random_int(1000000000, 9999999999);
             $result = $helper->request_payment($random, $reference, $cost, $currency, $user['phone'], $user['country']);
-            $code = mtn_helper::array_helper('code', $result);
+            $code = (int)mtn_helper::array_helper('code', $result);
         }
         if ($code && $code == 202) {
             $cond = ['paymentid' => $itemid, 'userid' => $userid];
             $DB->delete_records('paygw_mtnafrica', $cond);
             $transactionid = mtn_helper::array_helper('xreferenceid', $result) ?? '0';
-            $data = new \stdClass;
+            $data = new \stdClass();
             $data->paymentid = $itemid;
             $data->userid = $userid;
             $data->transactionid = $transactionid;
@@ -102,7 +101,7 @@ class transaction_start extends external_api {
             $data->timecreated = time();
             $DB->insert_record('paygw_mtnafrica', $data);
         }
-        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => mtn_helper::ta_code($code)];
+        return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => mtn_helper::ta_code((int)$code)];
     }
 
     /**

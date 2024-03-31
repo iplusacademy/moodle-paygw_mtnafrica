@@ -35,7 +35,6 @@ use paygw_mtnafrica\mtn_helper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mtn_helper_test extends \advanced_testcase {
-
     /** @var config configuration */
     private $config;
 
@@ -67,6 +66,20 @@ final class mtn_helper_test extends \advanced_testcase {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
         $this->assertEquals('sandbox', mtn_helper::target_code('BE'));
         $this->assertNotEmpty(mtn_helper::get_hostname());
+
+        $this->assertEquals(null, mtn_helper::array_helper('BE', ['FR' => 'France']));
+        $this->assertEquals('Belgium', mtn_helper::array_helper('BE', ['BE' => 'Belgium']));
+
+        $arr = ['FR' => 'France', 'BE' => 'Belgium'];
+        $this->assertEquals(null, mtn_helper::array_helper('BE', ['countries' => $arr]));
+        $this->assertEquals($arr, mtn_helper::array_helper('countries', ['countries' => $arr]));
+
+        $key = 'user<script>alert(1);</script>xss';
+        $obj = (object)['name' => $key, $key => 'heslo', 'email' => 'xssuser@example.com'];
+        $arr = (array)$obj;
+        $this->assertEquals(null, mtn_helper::array_helper('name', ['countries' => $arr]));
+        $this->assertEquals(null, mtn_helper::array_helper($key, ['countries' => $arr]));
+        $this->assertEquals('me', mtn_helper::array_helper('name', ['name' => 'me', $key => $arr]));
     }
 
     /**
@@ -102,7 +115,7 @@ final class mtn_helper_test extends \advanced_testcase {
         $mtnhelper->valid_user('123456789');
         $result = $mtnhelper->current_user_data();
         $this->assertEquals('123456789', $result['phone']);
-        $data = new \stdClass;
+        $data = new \stdClass();
         $data->paymentid = $feeid;
         $data->userid = $user->id;
         $data->transactionid = $xref;

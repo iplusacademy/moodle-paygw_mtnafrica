@@ -31,7 +31,6 @@ namespace paygw_mtnafrica\task;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class clean_up extends \core\task\scheduled_task {
-
     /**
      * Name for this task.
      *
@@ -49,4 +48,3 @@ class clean_up extends \core\task\scheduled_task {
         $DB->delete_records_select('paygw_mtnafrica', 'timecompleted = :cond', ['cond' => null]);
     }
 }
-

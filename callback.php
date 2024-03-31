@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     http_response_code(405);
 } else {
     if ($response = json_decode(file_get_contents('php://input'), true)) {
-
         // Sample data:
         // [financialTransactionId] => 2026118745
         // [externalId] => 2362616710

@@ -34,7 +34,6 @@ namespace paygw_mtnafrica;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gateway extends \core_payment\gateway {
-
     /**
      * Country - Currencies supported
      *
@@ -148,7 +147,11 @@ class gateway extends \core_payment\gateway {
      * @param array $errors form errors (passed by reference)
      */
     public static function validate_gateway_form(
-        \core_payment\form\account_gateway $form, \stdClass $data, array $files, array &$errors): void {
+        \core_payment\form\account_gateway $form,
+        \stdClass $data,
+        array $files,
+        array &$errors
+    ): void {
         $vals = empty($data->clientid) || empty($data->apikey) || empty($data->secret) || empty($data->secret1);
         if ($data->enabled && $vals) {
             $errors['enabled'] = get_string('gatewaycannotbeenabled', 'payment');

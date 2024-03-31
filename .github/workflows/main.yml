@@ -124,7 +124,7 @@ jobs:
             login: ${{ secrets.login }}
             secret: ${{ secrets.secret }}
             secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi behat --profile chrome || true
+        run: moodle-plugin-ci --ansi behat --profile chrome
 
       - name: failures
         if: ${{ failure() && steps.chrome.outcome == 'failure' }}

@@ -34,7 +34,6 @@ namespace paygw_mtnafrica\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class clean_up_test extends \advanced_testcase {
-
     /**
      * Test clean up.
      * @covers \paygw_mtnafrica\task\clean_up

@@ -37,7 +37,6 @@ use core_external;
  * @runTestsInSeparateProcesses
  */
 final class external_test extends \advanced_testcase {
-
     /** @var string phone */
     private $phone = '46733123454';
 
@@ -243,7 +242,7 @@ final class external_test extends \advanced_testcase {
         $this->assertEquals($CFG->wwwroot . '/course/view.php?id=' . $course->id, $successurl->out(false));
         $account = new \core_payment\account($payable->get_account_id());
 
-        \enrol_fee\payment\service_provider::deliver_order('fee',  $this->feeid, $paymentid, $user->id);
+        \enrol_fee\payment\service_provider::deliver_order('fee', $this->feeid, $paymentid, $user->id);
         $context = \context_course::instance($course->id);
         $this->assertTrue(is_enrolled($context, $user));
         $this->assertTrue(user_has_role_assignment($user->id, 5, $context->id));
@@ -261,7 +260,7 @@ final class external_test extends \advanced_testcase {
         $str .= 'nCTDURtza_3d7P6tTtmBKFh3YrD8Xu-bocWCW3ke9gDJ1D7DsXPQ3YIkp1Pq0Xm9L7AKDIzlYf83HW5R2ZoryG-dFXYDmJxYzO5CPMquT8LMhy0S';
         $str .= '6te5SCS-9eiHZN2vv9QCYgSIcZlMNdlysJv_wVUdgK5AQVIYvRJHtPNR7rYK8FBW5ke_mH-w8KbVW-lLibZPKroLmQ9OOZ_vzKY9GAkE8NDa0o9c';
         $str .= 'nCTDURtza_3d7P6tTtmBKFh3YrD8Xu-bocWCW3ke9gDJ1D7DsXPQ3YIkp1Pq0Xm9L7AKDIzlYf83HW5R2ZoryG-dFXYDmJxYzO5CPMquT8LMhy0S';
-        $data = new \stdClass;
+        $data = new \stdClass();
         $data->paymentid = '33';
         $data->userid = 2;
         $data->transactionid = '94559210-0b27-4077-98bc-56035ef472f2';

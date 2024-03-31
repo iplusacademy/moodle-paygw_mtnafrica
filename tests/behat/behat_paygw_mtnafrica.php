@@ -28,7 +28,7 @@
 
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Step definitions related to MTN Africa payment callback.
@@ -39,7 +39,6 @@ use Behat\Gherkin\Node\TableNode as TableNode;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_paygw_mtnafrica extends behat_base {
-
     /**
      * Get the secrets from the environment.
      * @Then I configure mtn

@@ -34,7 +34,6 @@ namespace paygw_mtnafrica\check;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mtnafrica_test extends \advanced_testcase {
-
     /**
      * Test checks.
      * @covers \paygw_mtnafrica\check\mtnafrica

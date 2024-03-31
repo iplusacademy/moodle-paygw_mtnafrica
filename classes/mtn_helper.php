@@ -39,7 +39,6 @@ use core_text;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mtn_helper {
-
     /**
      * @var string The base API URL
      */
@@ -81,7 +80,7 @@ class mtn_helper {
     public $token = '';
 
     /**
-     * @var boolean testing
+     * @var bool testing
      */
     public $testing = false;
 
@@ -239,7 +238,13 @@ class mtn_helper {
      * @return array int API code - xref.
      */
     public function request_payment(
-        int $transactionid, string $reference, float $amount, string $currency, string $userphone, string $usercountry): array {
+        int $transactionid,
+        string $reference,
+        float $amount,
+        string $currency,
+        string $userphone,
+        string $usercountry
+    ): array {
 
         $allcountries = \paygw_mtnafrica\gateway::get_countries();
         $usercountry = strtoupper($usercountry);
@@ -312,7 +317,11 @@ class mtn_helper {
      * @return array Decoded API response.
      */
     private function request_post(
-        string $location, array $data, array $headers = [], string $verb = 'POST'): ?array {
+        string $location,
+        array $data,
+        array $headers = [],
+        string $verb = 'POST'
+    ): ?array {
 
         $decoded = $result = $resultcode = '';
         $response = null;
@@ -409,7 +418,8 @@ class mtn_helper {
                                     $userid,
                                     $amount,
                                     $currency,
-                                    'mtnafrica');
+                                    'mtnafrica'
+                                );
                                 helper::deliver_order($component, $area, $itemid, $saved, $userid);
                                 $DB->set_field('paygw_mtnafrica', 'timecompleted', time(), $cond);
                                 $DB->set_field('paygw_mtnafrica', 'moneyid', $moneyid, $cond);
@@ -428,15 +438,15 @@ class mtn_helper {
 
     /**
      * Transaction code
-     * @param string $code
+     * @param int $code
      * @return string
      */
-    public static function ta_code(string $code): string {
+    public static function ta_code(int $code): string {
         $returns = [
-            '202' => 'Accepted',
-            '400' => 'Bad Request',
-            '409' => 'Conflict, duplicated reference id',
-            '500' => 'Internal Server Error',
+            202 => 'Accepted',
+            400 => 'Bad Request',
+            409 => 'Conflict, duplicated reference id',
+            500 => 'Internal Server Error',
         ];
         return self::array_helper($code, $returns) ?? 'Unknown';
     }
@@ -464,23 +474,21 @@ class mtn_helper {
     }
 
     /**
-     * Array helper.
+     * Safe array helper.
      *
      * @param string $key
      * @param array $arr
      * @return array||null
      */
     public static function array_helper(string $key, array $arr) {
-        if (is_array($arr) && isset($arr[$key]) && !empty($arr[$key])) {
-            $parameter = $arr[$key];
-            // Cleans parameters to avoid XSS and other issues.
-            if (is_array($parameter)) {
-                return clean_param_array($parameter, PARAM_ALPHANUMEXT, true);
-            }
-            return clean_param($parameter, PARAM_ALPHANUMEXT);
+        // TODO: return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : null;
+        // Cleans key and array to avoid XSS and other issues.
+        $safekey = clean_param($key, PARAM_TEXT);
+        $safearr = clean_param_array($arr, PARAM_TEXT, true);
+        if (is_array($safearr) && isset($safearr[$safekey]) && !empty($safearr[$safekey])) {
+            return $safearr[$safekey];
         }
         return null;
-        return ($arr && array_key_exists($key, $arr)) ? $arr[$key] : null;
     }
 
     /**
