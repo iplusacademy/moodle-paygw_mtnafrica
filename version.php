@@ -30,5 +30,5 @@ $plugin->component = 'paygw_mtnafrica';
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
 $plugin->maturity = MATURITY_STABLE;
 $plugin->supported = [402, 403];
-$plugin->release = 'v4.2.7';
-$plugin->version = 2024031000;
+$plugin->release = 'v4.2.9';
+$plugin->version = 2024033100;
