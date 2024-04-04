@@ -57,14 +57,14 @@
 
 }}
 <div id="mtn-image" class="bg-grey mb-4 w-100 text-center">
-    <img src="/payment/gateway/mtnafrica/pix/img.png" title="{{#str}} pluginname, paygw_mtnafrica {{/str}}" alt="{{#str}} pluginname, paygw_mtnafrica {{/str}}">
+    <img src="../payment/gateway/mtnafrica/pix/img.png" title="{{#str}} pluginname, paygw_mtnafrica {{/str}}" alt="{{#str}} pluginname, paygw_mtnafrica {{/str}}">
 </div>
 <div class="mb-4 w-100 text-center font-italic">{{#str}} mtnstart, paygw_mtnafrica {{/str}}</div>
 <div id="mtn-spinner" class="text-center mb-4 w-100 row">
     <span style="margin: auto;">{{#pix}} i/ajaxloader, core, Working {{/pix}}</span>
 </div>
 <div class="text-center">
-    <form id="mtn-form" action="/payment/gateway/mtnafrica/continue.php" method="post">
+    <form id="mtn-form" action="../payment/gateway/mtnafrica/continue.php" method="post">
         <input type="submit" value="{{#str}} proceed, moodle {{/str}}" id="mtn-pay" class="mtn-pay btn btn-primary" data-for="enablepay" disabled>
         <input type="submit" value="{{#str}} cancel, moodle {{/str}}" id="mtn-cancel" class="mtn-pay btn btn-secondary" data-for="enablepay">
         <input type="hidden" name="sesskey" value="{{sesskey}}">
