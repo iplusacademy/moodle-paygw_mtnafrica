@@ -30,11 +30,11 @@ $string['authorising'] = 'Authorising the payment. Please wait...';
 $string['brandname'] = 'Brand name';
 $string['brandname_help'] = 'An optional label that overrides the business name for the your account on the MTN Africa site.';
 $string['cannotfetchorderdatails'] = 'Could not fetch payment details from MTN Africa. Your account has not been debited.';
-$string['check_info'] = 'The sandbox environment of MTN Africa can be unsafe.';
-$string['check_info_help'] = 'MTN Africa uses the unsafe http port 80 for the callback.';
 $string['check_critical'] = 'MTN Africa uses the unsafe port 80 in the sandbox environment.';
 $string['check_critical_help'] = 'MTN Africa sends telephone nunbers, transaction ids, ... in the callback function using the unsave HTTP Port.
 It\'s better to disable the sandbox environement when it is not used.';
+$string['check_info'] = 'The sandbox environment of MTN Africa can be unsafe.';
+$string['check_info_help'] = 'MTN Africa uses the unsafe http port 80 for the callback.';
 $string['checkmtnafrica'] = 'MTN Africa';
 $string['cleanuptask'] = 'Clean up not completed payment task.';
 $string['clientid'] = 'API User';
