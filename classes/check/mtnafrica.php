@@ -25,7 +25,9 @@
 
 namespace paygw_mtnafrica\check;
 
+use action_link;
 use core\check\{check, result};
+use moodle_url;
 
 /**
  * Checks.
@@ -42,8 +44,42 @@ class mtnafrica extends check {
      * @return result
      */
     public function get_result(): result {
-        $summary = get_string('check_warning', 'paygw_mtnafrica');
-        $details = get_string('check_details', 'paygw_mtnafrica');
-        return new result(result::WARNING, $summary, $details);
+        if ($this->sandbox_used()) {
+            $info = result::CRITICAL;
+            $summary = get_string('check_critical', 'paygw_mtnafrica');
+            $details = get_string('check_critical_help', 'paygw_mtnafrica');
+        } else {
+            $info = result::INFO;
+            $summary = get_string('check_info', 'paygw_mtnafrica');
+            $details = get_string('check_info_help', 'paygw_mtnafrica');
+        }
+        return new result($info, $summary, $details);
+    }
+
+    /**
+     * Collect result.
+     *
+     * @return bool
+     */
+    private function sandbox_used(): bool {
+        global $DB;
+        // If sandbox is enabled, we need to show danger, otherwise just a warning.
+        $compare = $DB->sql_position("'sandbox'", 'config');
+        $where = "gateway = :gateway AND enabled = :enabled AND $compare > 0";
+        return $DB->count_records_select('payment_gateways', $where, ['gateway' => 'mtnafrica', 'enabled' => 1]) !== 0;
+    }
+
+    /**
+     * Link to the Gateways report
+     *
+     * @return action_link|null
+     */
+    public function get_action_link(): ?action_link {
+        if ($this->sandbox_used()) {
+            return new action_link(
+                new moodle_url('/payment/accounts.php'), get_string('paymentaccounts', 'payment'),
+            );
+        }
+        return null;
     }
 }

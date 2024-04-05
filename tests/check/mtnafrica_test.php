@@ -39,12 +39,27 @@ final class mtnafrica_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\check\mtnafrica
      */
     public function test_checks(): void {
-        global $CFG;
+        global $CFG, $DB;
+        $this->resetAfterTest(true);
         require_once($CFG->dirroot . '/payment/gateway/mtnafrica/lib.php');
         $checks = paygw_mtnafrica_security_checks();
         $this->assertCount(1, $checks);
         $check = new \paygw_mtnafrica\check\mtnafrica();
-        $this->assertEquals('warning', $check->get_result()->get_status());
-        $this->assertEmpty($check->get_action_link());
+        $this->assertEquals('info', $check->get_result()->get_status());
+        $this->assertNull($check->get_action_link());
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
+        $account = $generator->create_payment_account(['gateways' => 'mtnafrica']);
+        $config = [
+            'brandname' => 'mtn',
+            'environment' => 'sandbox',
+            'clientid' => 'fakelogin',
+            'apikey' => 'fakeapikey',
+            'secret' => 'fakesecret',
+            'secret1' => 'fakesecret',
+        ];
+        $DB->set_field('payment_gateways', 'config', json_encode($config), []);
+        $check = new \paygw_mtnafrica\check\mtnafrica();
+        $this->assertEquals('critical', $check->get_result()->get_status());
+        $this->assertNotEmpty($check->get_action_link());
     }
 }
