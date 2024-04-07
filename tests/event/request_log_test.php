@@ -47,7 +47,7 @@ final class request_log_test extends \advanced_testcase {
         ];
         $event = request_log::create($eventarray);
         $event->trigger();
-        $event->get_name();
-        $event->get_description();
+        $this->assertEquals('MTN Gateway log', $event->get_name());
+        $this->assertEquals('token  : faketoken <br />transaction  : {"id":"fakeid"} <br />', $event->get_description());
     }
 }

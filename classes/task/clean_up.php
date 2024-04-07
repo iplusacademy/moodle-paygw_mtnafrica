@@ -45,6 +45,6 @@ class clean_up extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-        $DB->delete_records_select('paygw_mtnafrica', 'timecompleted = :cond', ['cond' => null]);
+        $DB->delete_records_select('paygw_mtnafrica', 'timecompleted IS NULL', []);
     }
 }

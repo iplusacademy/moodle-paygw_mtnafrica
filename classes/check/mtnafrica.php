@@ -63,7 +63,7 @@ class mtnafrica extends check {
      */
     private function sandbox_used(): bool {
         global $DB;
-        // If sandbox is enabled, we need to show danger, otherwise just a warning.
+        // If the MTN sandbox is enabled, we need to show danger, otherwise just a warning.
         $compare = $DB->sql_position("'sandbox'", 'config');
         $where = "gateway = :gateway AND enabled = :enabled AND $compare > 0";
         return $DB->count_records_select('payment_gateways', $where, ['gateway' => 'mtnafrica', 'enabled' => 1]) !== 0;

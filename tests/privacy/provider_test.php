@@ -60,6 +60,19 @@ final class provider_test extends provider_testcase {
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
+        $user = $generator->create_user();
+        $id = $generator->get_plugin_generator('core_payment')->create_payment(
+            ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'mtnafrica', 'userid' => $user->id]
+        );
+        $data = new stdClass();
+        $data->paymentid = $id;
+        $data->userid = $user->id;
+        $data->transactionid = '666666665';
+        $data->moneyid = 'firstbadmoneyid';
+        $data->timecreated = time();
+        $DB->insert_record('paygw_mtnafrica', $data);
+
+        $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
         $this->user = $generator->create_user();
         $id = $generator->get_plugin_generator('core_payment')->create_payment(
             ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'mtnafrica', 'userid' => $this->user->id]
@@ -90,21 +103,25 @@ final class provider_test extends provider_testcase {
      */
     public function test_provider(): void {
         global $DB;
-        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
+        $this->assertEquals(2, $DB->count_records('paygw_mtnafrica', []));
         $context = context_user::instance($this->user->id);
         $contextlist = provider::get_contexts_for_userid($this->user->id);
         $this->assertCount(1, $contextlist);
         $list = new approved_contextlist($this->user, 'paygw_mtnafrica', [$context->instanceid]);
         $this->assertNotEmpty($list);
         provider::delete_data_for_user($list);
+        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
+        $user = self::getDataGenerator()->create_user();
+        $context = context_user::instance($user->id);
         provider::delete_data_for_all_users_in_context($context);
+        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
         $user = self::getDataGenerator()->create_user();
         $context = context_user::instance($user->id);
         $list = new approved_contextlist($user, 'paygw_mtnafrica', [$context->instanceid]);
         $this->assertNotEmpty($list);
         provider::export_payment_data(context_system::instance(), ['course'], $this->payrec);
         $this->assertEmpty(provider::delete_data_for_payment_sql($this->payrec->paymentid, []));
-        $this->assertEquals(0, $DB->count_records('paygw_mtnafrica', []));
+        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
     }
 
     /**
@@ -115,7 +132,7 @@ final class provider_test extends provider_testcase {
         global $DB;
         provider::export_payment_data(context_system::instance(), ['course'], $this->payrec);
         $this->assertEmpty(provider::delete_data_for_payment_sql($this->payrec->paymentid, []));
-        $this->assertEquals(0, $DB->count_records('paygw_mtnafrica', []));
+        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
     }
 
 
@@ -136,6 +153,7 @@ final class provider_test extends provider_testcase {
      * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_new_functions(): void {
+        global $DB;
         $context = context_user::instance($this->user->id);
         $userlist = new userlist($context, 'paygw_mtnafrica');
         provider::get_users_in_context($userlist);
@@ -147,9 +165,17 @@ final class provider_test extends provider_testcase {
         $this->assertCount(0, $userlist);
 
         $approved = new approved_userlist($context, 'paygw_mtnafrica', [$this->user->id]);
+        $this->assertCount(1, $approved);
+        $this->assertEquals($context, $approved->get_context());
+        $this->assertCount(1, $approved->get_userids());
+        $this->assertEquals(2, $DB->count_records('paygw_mtnafrica', []));
         provider::delete_data_for_users($approved);
+        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
+
         $userlist = new userlist($context, 'paygw_mtnafrica');
         provider::get_users_in_context($userlist);
         $this->assertCount(1, $userlist);
+        $this->assertEquals($context, $userlist->get_context());
+        $this->assertCount(1, $userlist->get_userids());
     }
 }

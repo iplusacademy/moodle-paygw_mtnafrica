@@ -167,7 +167,6 @@ class mtn_helper {
         foreach ($lines as $line) {
             if (stripos($line, $needle) !== false) {
                 $result = strip_tags(str_ireplace($arr, '', $line));
-                break;
             }
         }
         // Localhost callbacks are redirected.

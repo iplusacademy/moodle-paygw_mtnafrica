@@ -39,9 +39,22 @@ final class clean_up_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\task\clean_up
      */
     public function test_clean_up(): void {
+        global $DB;
         $this->resetAfterTest();
         $task = new \paygw_mtnafrica\task\clean_up();
-        $task->get_name();
+        $this->assertEquals('Clean up not completed payment task.', $task->get_name());
         $task->execute();
+        $data = new \stdClass();
+        $data->paymentid = 1;
+        $data->userid = 1;
+        $data->transactionid = 1;
+        $data->moneyid = 1;
+        $data->timecreated = time();
+        $DB->insert_record('paygw_mtnafrica', $data);
+        $cnt = $DB->count_records('paygw_mtnafrica', []);
+        $this->assertEquals(1, $cnt);
+        $task->execute();
+        $cnt = $DB->count_records('paygw_mtnafrica', []);
+        $this->assertEquals(0, $cnt);
     }
 }
