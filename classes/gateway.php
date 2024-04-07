@@ -131,6 +131,8 @@ class gateway extends \core_payment\gateway {
         $options = ['live' => $strs->live, 'sandbox' => $strs->sandbox];
         $mform->addElement('select', 'environment', $strs->environment, $options);
         $mform->addHelpButton('environment', 'environment', 'paygw_mtnafrica');
+        $mform->addElement('static', 'check_critical', get_string('check_critical', 'paygw_mtnafrica'));
+        $mform->addHelpButton('check_critical', 'check_critical', 'paygw_mtnafrica');
 
         $mform->addRule('clientid', get_string('required'), 'required');
         $mform->addRule('apikey', get_string('required'), 'required');
