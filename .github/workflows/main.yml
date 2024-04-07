@@ -126,7 +126,7 @@ jobs:
         if: ${{ failure() && steps.chrome.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
-          name: Behat Faildump (${{ join(matrix.*, ', ') }})
+          name: chrome faildump (${{ join(matrix.*, ', ') }})
           path: ${{ github.workspace }}/moodledata/behat_dump
           retention-days: 7
           if-no-files-found: ignore

@@ -100,7 +100,8 @@ class gateway extends \core_payment\gateway {
      * @param \core_payment\form\account_gateway $form
      */
     public static function add_configuration_to_gateway_form(\core_payment\form\account_gateway $form): void {
-        $arr = ['brandname', 'clientid', 'apikey', 'secret', 'secret1', 'live', 'sandbox', 'environment', 'country'];
+        global $OUTPUT;
+        $arr = ['apikey', 'brandname', 'clientid', 'country', 'environment', 'live', 'sandbox', 'secret', 'secret1'];
         $strs = get_strings($arr, 'paygw_mtnafrica');
         $mform = $form->get_mform();
 
@@ -131,8 +132,6 @@ class gateway extends \core_payment\gateway {
         $options = ['live' => $strs->live, 'sandbox' => $strs->sandbox];
         $mform->addElement('select', 'environment', $strs->environment, $options);
         $mform->addHelpButton('environment', 'environment', 'paygw_mtnafrica');
-        $mform->addElement('static', 'check_critical', get_string('check_critical', 'paygw_mtnafrica'));
-        $mform->addHelpButton('check_critical', 'check_critical', 'paygw_mtnafrica');
 
         $mform->addRule('clientid', get_string('required'), 'required');
         $mform->addRule('apikey', get_string('required'), 'required');

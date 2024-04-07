@@ -30,16 +30,15 @@ $string['authorising'] = 'Authorising the payment. Please wait...';
 $string['brandname'] = 'Brand name';
 $string['brandname_help'] = 'An optional label that overrides the business name for the your account on the MTN Africa site.';
 $string['cannotfetchorderdatails'] = 'Could not fetch payment details from MTN Africa. Your account has not been debited.';
-$string['check_critical'] = 'The sandbox environment of MTN Africa can be unsafe.';
-$string['check_critical_help'] = 'MTN Africa sends telephone nunbers, transaction ids, ... in the callback function using the unsave HTTP Port.
-It\'s better to disable the sandbox environement when it is not used.';
 $string['cleanuptask'] = 'Clean up not completed payment task.';
 $string['clientid'] = 'API User';
 $string['clientid_help'] = 'The API User ID that MTN Africa generated for your application.';
 $string['country'] = 'Country';
 $string['country_help'] = 'In which country is this client located';
 $string['environment'] = 'Environment';
-$string['environment_help'] = 'You can set this to Sandbox if you are using sandbox accounts (for testing purpose only).';
+$string['environment_help'] = 'You can set this to Sandbox if you are using sandbox accounts (for testing purpose only).
+But the use of the MTN sandbox environment is not recommended: MTN Africa sends telephone nunbers, transaction ids, ... in the callback function using the unsave HTTP Port.
+It\'s better to disable the sandbox environement when it is not used.';
 $string['failed'] = 'MTN Africa payment failed';
 $string['gatewaydescription'] = 'MTN Africa is an authorised payment gateway provider for processing mobile money.';
 $string['gatewayname'] = 'MTN Africa';
