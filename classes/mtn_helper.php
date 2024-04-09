@@ -347,8 +347,12 @@ class mtn_helper {
                 // TODO: uncomment for tracing.
                 // mtrace(json_encode($decolog));.
             } else {
-                $resultcode = $response->getStatusCode();
-                $resultreason = $response->getReasonPhrase();
+                $resultcode = 500;
+                $resultreason = 'Timeout';
+                if ($response) {
+                    $resultcode = $response->getStatusCode();
+                    $resultreason = $response->getReasonPhrase();
+                }
                 $other['result'] = $resultcode . ' ' . $resultreason;
                 // TODO: uncomment for tracing.
                 // mtrace($resultcode);.
