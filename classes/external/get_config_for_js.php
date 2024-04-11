@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace paygw_mtnafrica\external;
 
+use context_user;
+use context_system;
 use core_payment\helper;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
 use paygw_mtnafrica\mtn_helper;
@@ -62,6 +64,11 @@ class get_config_for_js extends external_api {
      * @return string[]
      */
     public static function execute(string $component, string $paymentarea, int $itemid): array {
+        global $USER;
+        $usercontext = context_user::instance($USER->id);
+        self::validate_context($usercontext);
+        $systencontext = context_system::instance();
+        self::validate_context($systencontext);
         $gateway = 'mtnafrica';
         $arr = ['component' => $component, 'paymentarea' => $paymentarea, 'itemid' => $itemid];
         self::validate_parameters(self::execute_parameters(), $arr);

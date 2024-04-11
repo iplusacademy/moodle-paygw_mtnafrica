@@ -100,7 +100,6 @@ class gateway extends \core_payment\gateway {
      * @param \core_payment\form\account_gateway $form
      */
     public static function add_configuration_to_gateway_form(\core_payment\form\account_gateway $form): void {
-        global $OUTPUT;
         $arr = ['apikey', 'brandname', 'clientid', 'country', 'environment', 'live', 'sandbox', 'secret', 'secret1'];
         $strs = get_strings($arr, 'paygw_mtnafrica');
         $mform = $form->get_mform();
