@@ -18,7 +18,7 @@
  * Contains helper class to work with MTN Africa REST API.
  *
  * @package    paygw_mtnafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,7 +34,7 @@ use core_text;
  * Contains helper class to work with MTN Africa REST API.
  *
  * @package    paygw_mtnafrica
- * @copyright  2023 Medical Access Uganda Limited
+ * @copyright  Medical Access Uganda Limited (e-learning.medical-access.org)
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -331,10 +331,12 @@ class mtn_helper {
             $result = $response->getBody()->getContents();
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $result = $e->getMessage();
-            mtrace_exception($e);
+            // TODO: uncomment for tracing.
+            // mtrace_exception($e);.
         } catch (\Exception $e) {
             $result = $e->getMessage();
-            mtrace_exception($e);
+            // TODO: uncomment for tracing.
+            // mtrace_exception($e);.
         } finally {
             $decoded = json_decode($result, true);
             $other = ['verb' => $verb, 'location' => $location];

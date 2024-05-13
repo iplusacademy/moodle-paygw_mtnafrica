@@ -8,8 +8,8 @@ It is possible to test with real data, just add some environment variables befor
     env secret=61e00000-dddd-eeee-ffff-000000000157
     env secret1=35600000-gggg-hhhh-iiii-000000000823
     
-    moodle-plugin-ci phpunit --coverage-text --coverage-clover payment/gateway/mtnafrica
-    moodle-plugin-ci behat --coverage-text --coverage-clover payment/gateway/mtnafrica
+    moodle-plugin-ci phpunit --testdox --coverage-text --coverage-clover payment/gateway/mtnafrica
+    moodle-plugin-ci behat payment/gateway/mtnafrica
 
 You can also use repository secrets in GitHub actions (when using a private repository):
 
