@@ -39,10 +39,12 @@ final class callback_test extends \advanced_testcase {
 
     /** @var config configuration */
     private $config;
+
     /**
      * Setup function.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
         set_config('country', 'UG');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');

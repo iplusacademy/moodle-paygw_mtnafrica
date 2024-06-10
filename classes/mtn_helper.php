@@ -490,10 +490,7 @@ class mtn_helper {
         // Cleans key and array to avoid XSS and other issues.
         $safekey = clean_param($key, PARAM_TEXT);
         $safearr = clean_param_array($arr, PARAM_TEXT, true);
-        if (is_array($safearr) && isset($safearr[$safekey]) && !empty($safearr[$safekey])) {
-            return $safearr[$safekey];
-        }
-        return null;
+        return (isset($safearr[$safekey])) ? $safearr[$safekey] : null;
     }
 
     /**

@@ -43,6 +43,7 @@ final class mtn_helper_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
         $this->resetAfterTest(true);
         set_config('country', 'UG');
         $secret = getenv('secret', true) ?: getenv('secret');
@@ -64,7 +65,23 @@ final class mtn_helper_test extends \advanced_testcase {
      */
     public function test_empty_helper(): void {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
+        $this->assertEquals('Bad Request', mtn_helper::ta_code(400));
+        $this->assertEquals('Conflict, duplicated reference id', mtn_helper::ta_code(409));
+        $this->assertEquals('Internal Server Error', mtn_helper::ta_code(500));
+        $this->assertEquals('Unknown', mtn_helper::ta_code(501));
+        $this->assertEquals('Unknown', mtn_helper::ta_code(499));
         $this->assertEquals('sandbox', mtn_helper::target_code('BE'));
+        $this->assertEquals('mtnuganda', mtn_helper::target_code('UG'));
+        $this->assertEquals('mtnghana', mtn_helper::target_code('GH'));
+        $this->assertEquals('mtnivorycoast', mtn_helper::target_code('CI'));
+        $this->assertEquals('mtnzambia', mtn_helper::target_code('ZM'));
+        $this->assertEquals('mtncameroon', mtn_helper::target_code('CM'));
+        $this->assertEquals('mtnbenin', mtn_helper::target_code('BJ'));
+        $this->assertEquals('mtncongo', mtn_helper::target_code('CD'));
+        $this->assertEquals('mtnswaziland', mtn_helper::target_code('SZ'));
+        $this->assertEquals('mtnguineaconakry', mtn_helper::target_code('GN'));
+        $this->assertEquals('mtnsouthafrica', mtn_helper::target_code('ZA'));
+        $this->assertEquals('mtnliberia', mtn_helper::target_code('LR'));
         $this->assertNotEmpty(mtn_helper::get_hostname());
 
         $this->assertEquals(null, mtn_helper::array_helper('BE', ['FR' => 'France']));

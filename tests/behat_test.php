@@ -39,6 +39,7 @@ final class behat_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         global $CFG;
+        parent::setUp();
         if ($CFG->version < 2023042400) {
             require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
         }

@@ -102,6 +102,8 @@ class gateway extends \core_payment\gateway {
     public static function add_configuration_to_gateway_form(\core_payment\form\account_gateway $form): void {
         $arr = ['apikey', 'brandname', 'clientid', 'country', 'environment', 'live', 'sandbox', 'secret', 'secret1'];
         $strs = get_strings($arr, 'paygw_mtnafrica');
+        $req = get_string('required');
+
         $mform = $form->get_mform();
 
         $mform->addElement('text', 'brandname', $strs->brandname);
@@ -111,18 +113,22 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('text', 'clientid', $strs->clientid);
         $mform->setType('clientid', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('clientid', 'clientid', 'paygw_mtnafrica');
+        $mform->addRule('clientid', $req, 'required');
 
         $mform->addElement('passwordunmask', 'apikey', $strs->apikey);
         $mform->setType('apikey', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('apikey', 'apikey', 'paygw_mtnafrica');
+        $mform->addRule('apikey', $req, 'required');
 
         $mform->addElement('passwordunmask', 'secret', $strs->secret);
         $mform->setType('secret', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('secret', 'secret', 'paygw_mtnafrica');
+        $mform->addRule('secret', $req, 'required');
 
         $mform->addElement('passwordunmask', 'secret1', $strs->secret1);
         $mform->setType('secret1', PARAM_RAW_TRIMMED);
         $mform->addHelpButton('secret1', 'secret1', 'paygw_mtnafrica');
+        $mform->addRule('secret1', $req, 'required');
 
         $options = self::get_supported_countries();
         $mform->addElement('select', 'country', $strs->country, $options, 'UG');
@@ -131,11 +137,6 @@ class gateway extends \core_payment\gateway {
         $options = ['live' => $strs->live, 'sandbox' => $strs->sandbox];
         $mform->addElement('select', 'environment', $strs->environment, $options);
         $mform->addHelpButton('environment', 'environment', 'paygw_mtnafrica');
-
-        $mform->addRule('clientid', get_string('required'), 'required');
-        $mform->addRule('apikey', get_string('required'), 'required');
-        $mform->addRule('secret', get_string('required'), 'required');
-        $mform->addRule('secret1', get_string('required'), 'required');
     }
 
     /**

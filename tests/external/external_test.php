@@ -26,6 +26,8 @@
 namespace paygw_mtnafrica\external;
 
 use core_external;
+use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
+
 
 /**
  * Testing externals in payments API
@@ -52,6 +54,7 @@ final class external_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         global $DB;
+        parent::setUp();
         $this->resetAfterTest(true);
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
@@ -80,8 +83,30 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\get_config_for_js
      */
     public function test_config_for_js(): void {
-        $this->assertInstanceOf('core_external\external_function_parameters', get_config_for_js::execute_parameters());
-        $this->assertInstanceOf('core_external\external_single_structure', get_config_for_js::execute_returns());
+        $out = get_config_for_js::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'Component'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'An identifier for payment area in the component'),
+        ]);
+
+        $this->assertInstanceOf('core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = get_config_for_js::execute_returns();
+        $in = new external_single_structure([
+            'clientid' => new external_value(PARAM_TEXT, 'MTN Africa client ID'),
+            'brandname' => new external_value(PARAM_TEXT, 'Brand name'),
+            'country' => new external_value(PARAM_TEXT, 'Client country'),
+            'cost' => new external_value(PARAM_FLOAT, 'Amount (with surcharge) that will be debited from the payer account'),
+            'currency' => new external_value(PARAM_TEXT, 'ISO4217 Currency code'),
+            'phone' => new external_value(PARAM_TEXT, 'User mobile phone'),
+            'usercountry' => new external_value(PARAM_TEXT, 'User country'),
+            'timeout' => new external_value(PARAM_INT, 'Timout'),
+            'reference' => new external_value(PARAM_TEXT, 'Reference'),
+        ]);
+        $this->assertInstanceOf('core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
     }
 
     /**
@@ -101,8 +126,23 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_start
      */
     public function test_transaction_start(): void {
-        $this->assertInstanceOf('core_external\external_function_parameters', transaction_start::execute_parameters());
-        $this->assertInstanceOf('core_external\external_single_structure', transaction_start::execute_returns());
+        $out = transaction_start::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'The component name'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
+        ]);
+        $this->assertInstanceOf('core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = transaction_start::execute_returns();
+        $in = new external_function_parameters([
+            'transactionid' => new external_value(PARAM_RAW, 'A valid transaction id or 0 when not successful'),
+            'reference' => new external_value(PARAM_RAW, 'A reference'),
+            'message' => new external_value(PARAM_RAW, 'Usualy the error message'),
+        ]);
+        $this->assertInstanceOf('core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
     }
 
     /**
@@ -123,8 +163,23 @@ final class external_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_transaction_complete(): void {
-        $this->assertInstanceOf('core_external\external_function_parameters', transaction_complete::execute_parameters());
-        $this->assertInstanceOf('core_external\external_single_structure', transaction_complete::execute_returns());
+        $out = transaction_complete::execute_parameters();
+        $in = new external_function_parameters([
+            'component' => new external_value(PARAM_COMPONENT, 'The component name'),
+            'paymentarea' => new external_value(PARAM_AREA, 'Payment area in the component'),
+            'itemid' => new external_value(PARAM_INT, 'The item id in the context of the component area'),
+            'xreferenceid' => new external_value(PARAM_TEXT, 'The order id coming back from MTN Africa'),
+        ]);
+        $this->assertInstanceOf('core_external\external_function_parameters', $out);
+        $this->assertEquals($in, $out);
+
+        $out = transaction_complete::execute_returns();
+        $in = new external_function_parameters([
+            'success' => new external_value(PARAM_BOOL, 'Whether everything was successful or not.'),
+            'message' => new external_value(PARAM_RAW, 'Message (usually the error message).'),
+        ]);
+        $this->assertInstanceOf('core_external\external_single_structure', $out);
+        $this->assertEquals($in, $out);
     }
 
     /**

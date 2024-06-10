@@ -41,6 +41,7 @@ final class gateway_test extends \advanced_testcase {
      * Setup function.
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
         set_config('country', 'UG');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_payment');
@@ -52,16 +53,85 @@ final class gateway_test extends \advanced_testcase {
      * @covers \paygw_mtnafrica\gateway
      */
     public function test_gateway(): void {
+        $out = ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR', 'ZMW'];
         $this->assertCount(11, gateway::get_supported_currencies());
+        $this->assertEquals($out, gateway::get_supported_currencies());
+        $out = [
+            'BJ' => 'XOF',
+            'CM' => 'XAF',
+            'TD' => 'XAF',
+            'CG' => 'XAF',
+            'CD' => 'CDF',
+            'GH' => 'GHS',
+            'GN' => 'GNF',
+            'CI' => 'XOF',
+            'LR' => 'LRD',
+            'NE' => 'XOF',
+            'RW' => 'RWF',
+            'ZA' => 'ZAR',
+            'UG' => 'UGX',
+            'ZM' => 'ZMW',
+            'sandbox' => 'EUR',
+        ];
         $this->assertCount(15, gateway::get_country_currencies());
+        $this->assertEquals($out, gateway::get_country_currencies());
+        $out = ['BJ', 'CM', 'TD', 'CG', 'CD', 'GA', 'GH', 'CI', 'LR', 'NE', 'RW', 'ZA', 'UG', 'ZM'];
         $this->assertCount(14, gateway::get_countries());
+        $this->assertEquals($out, gateway::get_countries());
         $errors = [];
         $gateway = $this->account->get_gateways()['mtnafrica'];
         $form = new \core_payment\form\account_gateway('', ['persistent' => $gateway]);
+        $this->assertInstanceOf('core_payment\form\account_gateway', $form);
+        $values = $form->get_mform()->exportValues();
+        $this->assertEquals('mtnafrica', $values['gateway']);
+
         $data = new \stdClass();
         $data->enabled = true;
         gateway::validate_gateway_form($form, $data, [], $errors);
         $this->assertCount(1, $errors);
+        $this->assertEquals($errors,
+            [
+                'enabled' => 'The payment gateway cannot be enabled because the configuration is incomplete.',
+            ]
+        );
+
+        $errors = [];
+        $data->clientid = 'clientid  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(1, $errors);
+
+        $errors = [];
+        $data->apikey = 'key  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(1, $errors);
+
+        $errors = [];
+        $data->secret1 = 'secret  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(1, $errors);
+
+        $errors = [];
+        $data->secret = 'secret  ';
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(0, $errors);
+
+        $errors = [];
+        $data->enabled = false;
+        gateway::validate_gateway_form($form, $data, [], $errors);
+        $this->assertCount(0, $errors);
+
+        $out = $form->render();
+        $this->assertStringContainsString('Uganda', $out);
+        $this->assertStringContainsString('Live', $out);
+        $this->assertStringContainsString('Sandbox', $out);
+        $this->assertStringContainsString('Required', $out);
+        $this->assertStringContainsString('Help with Brand name', $out);
+        $this->assertStringContainsString('Help with Country', $out);
+        $this->assertStringContainsString('Help with Secondary Key', $out);
+        $this->assertStringContainsString('Help with API key', $out);
+        $this->assertStringContainsString('Help with API User', $out);
+        $this->assertStringContainsString('Help with Environment', $out);
+
     }
 
     /**

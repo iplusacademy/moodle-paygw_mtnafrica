@@ -90,13 +90,12 @@ class provider implements
             $context = reset($contexts);
             if ($context->contextlevel == CONTEXT_USER) {
                 $user = $contextlist->get_user();
-                if ($records = $DB->get_records('paygw_mtnafrica', ['userid' => $user->id])) {
-                    foreach ($records as $data) {
-                        unset($data->id);
-                        $data->timecompleted = transform::datetime($data->timecompleted);
-                        $data->timecreated = transform::datetime($data->timecreated);
-                        writer::with_context($context)->export_data([], $data);
-                    }
+                $records = $DB->get_records('paygw_mtnafrica', ['userid' => $user->id]);
+                foreach ($records as $data) {
+                    unset($data->id);
+                    $data->timecompleted = transform::datetime($data->timecompleted);
+                    $data->timecreated = transform::datetime($data->timecreated);
+                    writer::with_context($context)->export_data([], $data);
                 }
             }
         }
