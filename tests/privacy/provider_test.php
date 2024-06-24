@@ -27,6 +27,7 @@ namespace paygw_mtnafrica\privacy;
 
 use context_system;
 use context_user;
+use core_payment\helper;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\{approved_userlist, approved_contextlist, userlist, writer};
 use core_privacy\tests\provider_testcase;
@@ -62,16 +63,28 @@ final class provider_test extends provider_testcase {
         $id = $generator->get_plugin_generator('core_payment')->create_payment(
             ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'mtnafrica', 'userid' => $user->id]
         );
+        $feeplugin = enrol_get_plugin('fee');
+        $course = $generator->create_course();
+        $data = [
+            'courseid' => $course->id,
+            'customint1' => $id,
+            'cost' => 250,
+            'currency' => 'USD',
+            'roleid' => 5,
+        ];
+        $feeid = $feeplugin->add_instance($course, $data);
+        $saved = helper::save_payment($id, 'enrol_fee', 'fee', $feeid, $user->id, 30, 'EUR', 'mtnafrica');
+        helper::deliver_order('enrol_fee', 'fee', $feeid, $saved, $user->id);
         $data = new stdClass();
         $data->paymentid = $id;
-        $data->userid = $user->id;
+        $data->userid = 2;
         $data->transactionid = '666666665';
         $data->moneyid = 'firstbadmoneyid';
         $data->timecreated = time();
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
-
         $DB->insert_record('paygw_mtnafrica', $data);
+
         $paygen = $generator->get_plugin_generator('core_payment');
         $account = $paygen->create_payment_account(['gateways' => 'mtnafrica']);
         $accountid = $account->get('id');
@@ -92,6 +105,8 @@ final class provider_test extends provider_testcase {
         $data->transactionid = '666666666';
         $data->moneyid = 'badmoneyid';
         $data->timecreated = time();
+        $data->component = 'mtnafrica';
+        $data->paymentarea = 'fee';
         $pid = $DB->insert_record('paygw_mtnafrica', $data);
         $data->id = $pid;
         $this->payrec = $data;
@@ -142,7 +157,7 @@ final class provider_test extends provider_testcase {
         $user = $this->create_user_with_payment();
         $context = context_user::instance($user->id);
         provider::delete_data_for_all_users_in_context($context);
-        $this->assertEquals(1, $DB->count_records('paygw_mtnafrica', []));
+        $this->assertEquals(2, $DB->count_records('paygw_mtnafrica', []));
         $user = $this->create_user_with_payment();
         $context = context_user::instance($user->id);
         $list = new approved_contextlist($user, 'paygw_mtnafrica', [$context->instanceid]);
@@ -150,7 +165,7 @@ final class provider_test extends provider_testcase {
         $this->assertEquals($list->get_user(), $user);
         $this->assertEquals(null, provider::export_payment_data(context_system::instance(), ['course'], $this->payrec));
         $this->assertEmpty(provider::delete_data_for_payment_sql($this->payrec->paymentid, []));
-        $this->assertEquals(2, $DB->count_records('paygw_mtnafrica', []));
+        $this->assertEquals(4, $DB->count_records('paygw_mtnafrica', []));
     }
 
     /**
@@ -177,8 +192,8 @@ final class provider_test extends provider_testcase {
         $this->export_all_data_for_user($this->user->id, 'paygw_mtnafrica');
         $data = $writer->get_data();
         $this->assertEquals($data->userid, $this->user->id);
-        $this->assertTrue(property_exists($data, 'transactionid'));
-        $this->assertTrue(property_exists($data, 'userid'));
+        $this->assertEquals($data->moneyid, 'badmoneyid');
+        $this->assertEquals($data->transactionid, '666666666');
     }
 
     /**
@@ -223,11 +238,10 @@ final class provider_test extends provider_testcase {
         global $DB;
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
-        $accountuser = $generator->create_user();
-        $id = $generator->get_plugin_generator('core_payment')->create_payment(
-            ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'mtnafrica', 'userid' => $accountuser->id]
-        );
         $user = $generator->create_user();
+        $id = $generator->get_plugin_generator('core_payment')->create_payment(
+            ['accountid' => $account->get('id'), 'amount' => 1, 'gateway' => 'mtnafrica', 'userid' => $user->id]
+        );
         $data = new stdClass();
         $data->paymentid = $id;
         $data->userid = $user->id;
@@ -236,6 +250,22 @@ final class provider_test extends provider_testcase {
         $data->timecreated = time();
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
+        $data->timecompleted = time();
+        $DB->insert_record('paygw_mtnafrica', $data);
+
+        $user2 = $generator->create_user();
+        $id = $generator->get_plugin_generator('core_payment')->create_payment(
+            ['accountid' => $account->get('id'), 'amount' => 2, 'gateway' => 'mtnafrica', 'userid' => $user2->id]
+        );
+        $data = new stdClass();
+        $data->paymentid = $id;
+        $data->userid = $user2->id;
+        $data->transactionid = '666666664';
+        $data->moneyid = 'secondbadmoneyid';
+        $data->timecreated = time();
+        $data->component = 'mtnafrica';
+        $data->paymentarea = 'fee';
+        $data->timecompleted = time();
         $DB->insert_record('paygw_mtnafrica', $data);
         return $user;
     }

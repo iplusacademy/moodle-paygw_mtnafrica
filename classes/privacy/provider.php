@@ -29,6 +29,7 @@ use core_payment\privacy\paygw_provider;
 use core_privacy\local\request\{writer, approved_contextlist, contextlist, core_userlist_provider, approved_userlist};
 use core_privacy\local\request\{userlist, transform, deletion_criteria};
 use core_privacy\local\metadata\collection;
+use stdClass;
 
 /**
  * Privacy Subsystem implementation for paygw_mtnafrica.
@@ -86,8 +87,7 @@ class provider implements
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
         $contexts = $contextlist->get_contexts();
-        if (count($contexts) > 0) {
-            $context = reset($contexts);
+        foreach ($contexts as $context) {
             if ($context->contextlevel == CONTEXT_USER) {
                 $user = $contextlist->get_user();
                 $records = $DB->get_records('paygw_mtnafrica', ['userid' => $user->id]);
@@ -104,7 +104,7 @@ class provider implements
     /**
      * Get the list of users who have data within a context.
      *
-     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      *
      */
     public static function get_users_in_context(userlist $userlist) {
@@ -134,7 +134,7 @@ class provider implements
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
-     * @param   approved_contextlist $contextlist The approved contexts and user information to delete information for.
+     * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
@@ -145,7 +145,7 @@ class provider implements
     /**
      * Delete multiple users within a single context.
      *
-     * @param   approved_userlist    $userlist The approved context and user information to delete information for.
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
      *
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
@@ -168,8 +168,11 @@ class provider implements
         global $DB;
         $subcontext[] = get_string('gatewayname', 'paygw_mtnafrica');
         if ($record = $DB->get_record('paygw_mtnafrica', ['paymentid' => $payment->paymentid])) {
-            $data = ['userid' => $record->userid, 'orderid' => $record->moneyid, 'transactionid' => $record->transactionid];
-            writer::with_context($context)->export_data($subcontext, (object)$data);
+            $data = new stdClass();
+            $data->userid = $record->userid;
+            $data->orderid = $record->moneyid;
+            $data->transactionid = $record->transactionid;
+            writer::with_context($context)->export_data($subcontext, $data);
         }
     }
 

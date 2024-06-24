@@ -8,6 +8,7 @@
     "mutators": {
         "@default": true,
     },
+
     "phpUnit": {
         "configDir": ".",
         "customPath": "./vendor/bin/phpunit"

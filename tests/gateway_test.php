@@ -121,17 +121,34 @@ final class gateway_test extends \advanced_testcase {
         $this->assertCount(0, $errors);
 
         $out = $form->render();
+        $out1 = preg_replace('/\s\s+/', '', $out);
+        $out1 = str_ireplace("\n", '', $out1);
+        $this->assertStringContainsString('id="id_clientid"value=""aria-required="true"', $out1);
+        $this->assertStringContainsString(
+            'id="id_secret1"value=""class="form-control d-none "data-size=""aria-required="true"',
+            $out1
+        );
+        $this->assertStringContainsString(
+            'id="id_apikey"value=""class="form-control d-none "data-size=""aria-required="true"',
+            $out1
+        );
+        $this->assertStringContainsString(
+            'id="id_secret"value=""class="form-control d-none "data-size=""aria-required="true"',
+            $out1
+        );
+        $this->assertStringContainsString(
+            '<option value="live">Live</option><option value="sandbox">Sandbox</option>',
+            $out1
+        );
         $this->assertStringContainsString('Uganda', $out);
-        $this->assertStringContainsString('Live', $out);
-        $this->assertStringContainsString('Sandbox', $out);
         $this->assertStringContainsString('Required', $out);
         $this->assertStringContainsString('Help with Brand name', $out);
         $this->assertStringContainsString('Help with Country', $out);
+        $this->assertStringContainsString('Help with Primary key', $out);
         $this->assertStringContainsString('Help with Secondary Key', $out);
         $this->assertStringContainsString('Help with API key', $out);
         $this->assertStringContainsString('Help with API User', $out);
         $this->assertStringContainsString('Help with Environment', $out);
-
     }
 
     /**

@@ -225,7 +225,7 @@ final class external_test extends \advanced_testcase {
         $this->assertEquals('Accepted', $result['message']);
 
         for ($i = 1; $i < 6; $i++) {
-            sleep(16);
+            sleep(17);
             $result = transaction_complete::execute('enrol_fee', 'fee', $this->feeid, $xref);
             $this->assertArrayHasKey('success', $result);
             $this->assertArrayHasKey('message', $result);
