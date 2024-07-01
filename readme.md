@@ -48,10 +48,13 @@ You can install this plugin from the plugin directory or get the latest version 
 git clone https://github.com/iplusacademy/moodle-paygw_mtnafrica.git payment/gateway/mtnafrica
 ```
 
-## Dependencies
+## Requirements
 
-* MOODLE_401_STABLE needs the [Amazon's SDK for PHP plugin](https://moodle.org/plugins/local_aws).
-* MOODLE_402_STABLE+ relies on Guzzle (already a part of Moodle).
+- This plugin requires Moodle 4.2.0+
+
+## Warning
+
+* This plugin is 100% open source and has NOT been tested in Moodle Workplace, Totara, or any other proprietary software system. As long as the latter do not reward plugin developers, you can use this plugin only in 100% open source environments.
 
 ## Configure Moodle
 
