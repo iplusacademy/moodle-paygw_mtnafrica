@@ -30,9 +30,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        moodle-branch: ['MOODLE_403_STABLE']
+        moodle-branch: ['MOODLE_404_STABLE', 'MOODLE_405_STABLE', 'main']
         php: ['8.2']
         database: ['mariadb', 'pgsql']
+        include:
+          - php: '8.3'
+            moodle-branch: 'main'
+            database: 'pgsql'
 
     steps:
       - name: checkout plugin
@@ -130,4 +134,13 @@ jobs:
           path: ${{ github.workspace }}/moodledata/behat_dump
           retention-days: 7
           if-no-files-found: ignore
-        
+
+      - name: admin bookmarks
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci --ansi behat --auto-rerun=0 --profile chrome blocks/admin_bookmarks
+        working-directory: moodle
+
+      - name: admin xmldb
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci --ansi behat --auto-rerun=0 --profile chrome admin/tool/xmldb
+        working-directory: moodle
