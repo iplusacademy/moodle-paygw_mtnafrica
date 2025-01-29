@@ -36,7 +36,7 @@ namespace paygw_mtnafrica\event;
 final class request_log_test extends \advanced_testcase {
     /**
      * Test request_log.
-     * @covers \paygw_mtnafrica\event\request_log
+     * #[CoversClass(paygw_mtnafrica\event\request_log)]
      */
     public function test_gateway(): void {
         $this->resetAfterTest();

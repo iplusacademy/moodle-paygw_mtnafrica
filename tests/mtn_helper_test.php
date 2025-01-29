@@ -61,7 +61,7 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Test MTN Africa helper
-     * @covers \paygw_mtnafrica\mtn_helper
+     * #[CoversClass(paygw_mtnafrica\mtn_helper)]
      */
     public function test_empty_helper(): void {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
@@ -101,8 +101,8 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Test MTN Africa helper
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
+     * #[CoversClass(paygw_mtnafrica\mtn_helper)]
+     * #[CoversClass(paygw_mtnafrica\event\request_log)]
      */
     public function test_other_helper(): void {
         global $DB;
@@ -147,9 +147,9 @@ final class mtn_helper_test extends \advanced_testcase {
      * @param string $input
      * @param string $output
      * @param string $reason
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
-     * @covers \paygw_mtnafrica\external\transaction_complete
+     * #[CoversClass(paygw_mtnafrica\mtn_helper)]
+     * #[CoversClass(paygw_mtnafrica\event\request_log)]
+     * #[CoversClass(paygw_mtnafrica\external\transaction_complete)]
      * @dataProvider provide_user_data
      */
     public function test_with_dataprovider(string $input, string $output, string $reason = ''): void {
@@ -207,8 +207,8 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Test success codes
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
+     * #[CoversClass(paygw_mtnafrica\mtn_helper)]
+     * #[CoversClass(paygw_mtnafrica\event\request_log)]
      */
     public function test_mtn_codes(): void {
         if ($this->config['secret'] == '') {
