@@ -49,7 +49,7 @@ final class behat_test extends \advanced_testcase {
 
     /**
      * Test callback.
-     * #[CoversClass(behat_paygw_mtnafrica)]
+     * @covers \behat_paygw_mtnafrica
      */
     public function test_behat(): void {
         $behat = new \behat_paygw_mtnafrica();

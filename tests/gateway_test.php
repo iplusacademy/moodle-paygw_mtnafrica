@@ -50,7 +50,7 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test gateway.
-     * #[CoversClass(paygw_mtnafrica\gateway)]
+     * @covers \paygw_mtnafrica\gateway
      */
     public function test_gateway(): void {
         $out = ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR', 'ZMW'];
@@ -153,7 +153,7 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test create account.
-     * #[CoversClass(paygw_mtnafrica\gateway)]
+     * @covers \paygw_mtnafrica\gateway
      */
     public function test_create_account(): void {
         global $DB;
@@ -174,7 +174,7 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test create payment.
-     * #[CoversClass(paygw_mtnafrica\gateway)]
+     * @covers \paygw_mtnafrica\gateway
      */
     public function test_create_payment(): void {
         global $DB;
@@ -187,7 +187,7 @@ final class gateway_test extends \advanced_testcase {
     /**
      * Test for get_payable().
      *
-     * #[CoversClass(paygw_mtnafrica\gateway)]
+     * @covers \paygw_mtnafrica\gateway
      */
     public function test_get_payable(): void {
         $feeplugin = enrol_get_plugin('fee');
