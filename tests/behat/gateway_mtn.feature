@@ -45,7 +45,7 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
     And I click on "Proceed" "button" in the "Select payment type" "dialogue"
@@ -58,7 +58,7 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "50"
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
@@ -76,7 +76,7 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 1"
-    And I should see "This course requires a payment for entry."
+    And I should see "This course requires a payment for entry"
     And I should see "50"
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
@@ -99,7 +99,7 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "50"
     And I press "Select payment type"
     And I should see "MTN Africa" in the "Select payment type" "dialogue"
@@ -118,7 +118,7 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 1"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "50"
     And I should see "Log in to the site"
 
@@ -127,6 +127,6 @@ Feature: MTN Africa payment gateway
     And I am on course index
     And I follow "paid courses"
     When I follow "Course 2"
-    Then I should see "This course requires a payment for entry."
+    Then I should see "This course requires a payment for entry"
     And I should see "5,000.00"
     And I should see "Log in to the site"
