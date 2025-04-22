@@ -27,7 +27,7 @@ namespace paygw_mtnafrica\external;
 
 use core_external;
 use core_external\{external_api, external_function_parameters, external_value, external_single_structure};
-
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Testing externals in payments API
@@ -38,6 +38,11 @@ use core_external\{external_api, external_function_parameters, external_value, e
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @runTestsInSeparateProcesses
  */
+#[CoversClass(get_config_for_js::class)]
+#[CoversClass(transaction_start::class)]
+#[CoversClass(transaction_complete::class)]
+#[CoversClass(\paygw_mtnafrica\event\request_log::class)]
+#[CoversClass(\paygw_mtnafrica\mtn_helper::class)]
 final class external_test extends \advanced_testcase {
     /** @var string phone */
     private $phone = '46733123454';
@@ -80,7 +85,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external config for js.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
      */
     public function test_config_for_js(): void {
         $out = get_config_for_js::execute_parameters();
@@ -111,7 +115,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external config for js with credits.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
      */
     public function test_config_for_jscredits(): void {
         if ($this->login == 'fakelogin') {
@@ -123,7 +126,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction_start.
-     * @covers \paygw_mtnafrica\external\transaction_start
      */
     public function test_transaction_start(): void {
         $out = transaction_start::execute_parameters();
@@ -147,7 +149,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction_start with credits.
-     * @covers \paygw_mtnafrica\external\transaction_start
      */
     public function test_transaction_startcredits(): void {
         global $USER;
@@ -160,7 +161,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction complete.
-     * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_transaction_complete(): void {
         $out = transaction_complete::execute_parameters();
@@ -184,7 +184,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test external transaction complete with valid credits.
-     * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_transaction_completecredits(): void {
         global $USER;
@@ -201,9 +200,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test complete cycle.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
-     * @covers \paygw_mtnafrica\external\transaction_start
-     * @covers \paygw_mtnafrica\external\transaction_complete
      */
     public function test_complete_cycle(): void {
         if ($this->login == 'fakelogin') {
@@ -238,8 +234,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test request log.
-     * @covers \paygw_mtnafrica\event\request_log
-     * @covers \paygw_mtnafrica\mtn_helper
      */
     public function test_request_log(): void {
         global $DB;
@@ -267,7 +261,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test payable.
-     * @covers \paygw_mtnafrica\external\get_config_for_js
      */
     public function test_payable(): void {
         global $CFG;
@@ -305,7 +298,6 @@ final class external_test extends \advanced_testcase {
 
     /**
      * Test inserting record.
-     * @covers \paygw_mtnafrica\external\transaction_start
      */
     public function test_inserting_record(): void {
         global $DB;

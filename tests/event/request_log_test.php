@@ -25,6 +25,8 @@
 
 namespace paygw_mtnafrica\event;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+
 /**
  * Testing event logs
  *
@@ -33,10 +35,10 @@ namespace paygw_mtnafrica\event;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(request_log::class)]
 final class request_log_test extends \advanced_testcase {
     /**
      * Test request_log.
-     * @covers \paygw_mtnafrica\event\request_log
      */
     public function test_gateway(): void {
         $this->resetAfterTest();

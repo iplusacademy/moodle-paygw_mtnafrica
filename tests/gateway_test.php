@@ -25,6 +25,8 @@
 
 namespace paygw_mtnafrica;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+
 /**
  * Testing generator in payments API
  *
@@ -33,6 +35,7 @@ namespace paygw_mtnafrica;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(gateway::class)]
 final class gateway_test extends \advanced_testcase {
     /** @var \core_payment\account account */
     private $account;
@@ -50,7 +53,6 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test gateway.
-     * @covers \paygw_mtnafrica\gateway
      */
     public function test_gateway(): void {
         $out = ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR', 'ZMW'];
@@ -153,7 +155,6 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test create account.
-     * @covers \paygw_mtnafrica\gateway
      */
     public function test_create_account(): void {
         global $DB;
@@ -174,7 +175,6 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test create payment.
-     * @covers \paygw_mtnafrica\gateway
      */
     public function test_create_payment(): void {
         global $DB;
@@ -186,8 +186,6 @@ final class gateway_test extends \advanced_testcase {
 
     /**
      * Test for get_payable().
-     *
-     * @covers \paygw_mtnafrica\gateway
      */
     public function test_get_payable(): void {
         $feeplugin = enrol_get_plugin('fee');

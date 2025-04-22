@@ -25,6 +25,8 @@
 
 namespace paygw_mtnafrica;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+
 /**
  * Testing generator in payments API
  *
@@ -33,6 +35,7 @@ namespace paygw_mtnafrica;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(mtn_helper::class)]
 final class callback_test extends \advanced_testcase {
     /** @var \core_payment\account account */
     private $account;
@@ -63,7 +66,6 @@ final class callback_test extends \advanced_testcase {
 
     /**
      * Test callback
-     * @covers \paygw_mtnafrica\mtn_helper
      */
     public function test_callback(): void {
         if ($this->config['secret'] == '') {
@@ -101,7 +103,6 @@ final class callback_test extends \advanced_testcase {
 
     /**
      * Test continue.
-     * @coversNothing
      */
     public function test_continue(): void {
         if ($this->config['secret'] == '') {

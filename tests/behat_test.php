@@ -25,6 +25,8 @@
 
 namespace paygw_mtnafrica;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+
 /**
  * Testing callback in MTN Africa payments API
  *
@@ -33,6 +35,7 @@ namespace paygw_mtnafrica;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(\behat_paygw_mtnafrica::class)]
 final class behat_test extends \advanced_testcase {
     /**
      * Setup function.
@@ -49,7 +52,6 @@ final class behat_test extends \advanced_testcase {
 
     /**
      * Test callback.
-     * @covers \behat_paygw_mtnafrica
      */
     public function test_behat(): void {
         $behat = new \behat_paygw_mtnafrica();

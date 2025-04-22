@@ -26,6 +26,8 @@
 namespace paygw_mtnafrica;
 
 use paygw_mtnafrica\mtn_helper;
+use PHPUnit\Framework\Attributes\{CoversClass, DataProvider};
+
 /**
  * Testing generator in payments API
  *
@@ -34,6 +36,8 @@ use paygw_mtnafrica\mtn_helper;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(mtn_helper::class)]
+#[CoversClass(event\request_log::class)]
 final class mtn_helper_test extends \advanced_testcase {
     /** @var config configuration */
     private $config;
@@ -61,7 +65,6 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Test MTN Africa helper
-     * @covers \paygw_mtnafrica\mtn_helper
      */
     public function test_empty_helper(): void {
         $this->assertEquals('Accepted', mtn_helper::ta_code(202));
@@ -101,8 +104,6 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Test MTN Africa helper
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
      */
     public function test_other_helper(): void {
         global $DB;
@@ -147,11 +148,8 @@ final class mtn_helper_test extends \advanced_testcase {
      * @param string $input
      * @param string $output
      * @param string $reason
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
-     * @covers \paygw_mtnafrica\external\transaction_complete
-     * @dataProvider provide_user_data
      */
+    #[DataProvider('provide_user_data')]
     public function test_with_dataprovider(string $input, string $output, string $reason = ''): void {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
@@ -192,23 +190,19 @@ final class mtn_helper_test extends \advanced_testcase {
 
     /**
      * Data to test
-     * @return string[][]
+     * @return \Generator
      */
-    public static function provide_user_data(): array {
-        return [
-            'Failed' => ['46733123450', 'failed', 'INTERNAL_PROCESSING_ERROR'],
-            'Rejected' => ['46733123451', 'failed', 'APPROVAL_REJECTED'],
-            'Timeout' => ['46733123452', 'failed', 'EXPIRED'],
-            'Ongoing' => ['46733123453', 'pending'],
-            'Pending' => ['46733123454', 'pending'],
-            'Succes' => ['46733123999', 'successful', 'SUCCESSFUL'],
-        ];
+    public static function provide_user_data(): \Generator {
+        yield 'Failed' => ['46733123450', 'failed', 'INTERNAL_PROCESSING_ERROR'];
+        yield 'Rejected' => ['46733123451', 'failed', 'APPROVAL_REJECTED'];
+        yield 'Timeout' => ['46733123452', 'failed', 'EXPIRED'];
+        yield 'Ongoing' => ['46733123453', 'pending'];
+        yield 'Pending' => ['46733123454', 'pending'];
+        yield 'Succes' => ['46733123999', 'successful', 'SUCCESSFUL'];
     }
 
     /**
      * Test success codes
-     * @covers \paygw_mtnafrica\mtn_helper
-     * @covers \paygw_mtnafrica\event\request_log
      */
     public function test_mtn_codes(): void {
         if ($this->config['secret'] == '') {

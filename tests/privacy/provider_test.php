@@ -33,6 +33,7 @@ use core_privacy\local\request\{approved_userlist, approved_contextlist, userlis
 use core_privacy\tests\provider_testcase;
 use paygw_mtnafrica\privacy\provider;
 use stdClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Privacy provider test for payment gateway mtnafrica.
@@ -42,6 +43,7 @@ use stdClass;
  * @author     Renaat Debleu <info@eWallah.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(provider::class)]
 final class provider_test extends provider_testcase {
     /** @var stdClass A student. */
     protected $user;
@@ -51,7 +53,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Basic setup for these tests.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function setUp(): void {
         global $DB;
@@ -114,7 +115,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Test returning metadata.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_get_metadata(): void {
         $collection = new collection('paygw_mtnafrica');
@@ -139,7 +139,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Test for provider.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_provider(): void {
         global $DB;
@@ -170,7 +169,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Test for remove.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_remove(): void {
         global $DB;
@@ -182,7 +180,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Check the exporting of payments for a user.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_export(): void {
         $context = context_user::instance($this->user->id);
@@ -198,7 +195,6 @@ final class provider_test extends provider_testcase {
 
     /**
      * Tests new functions.
-     * @covers \paygw_mtnafrica\privacy\provider
      */
     public function test_new_functions(): void {
         global $DB;
