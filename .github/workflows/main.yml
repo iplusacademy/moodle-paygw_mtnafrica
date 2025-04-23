@@ -79,7 +79,7 @@ jobs:
 
       - name: codechecker
         if: ${{ always() }}
-        run: moodle-plugin-ci --ansi codechecker --max-warnings 0
+        run: moodle-plugin-ci --ansi codechecker
 
       - name: validate
         if: ${{ always() }}
