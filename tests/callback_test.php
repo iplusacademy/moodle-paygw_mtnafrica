@@ -68,11 +68,11 @@ final class callback_test extends \advanced_testcase {
      * Test callback
      */
     public function test_callback(): void {
+        global $CFG;
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
-        $location = \paygw_mtnafrica\mtn_helper::get_hostname();
-        $location .= '/payment/gateway/mtnafrica/callback.php';
+        $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/callback.php';
         $data = [
             'financialTransactionId' => 2026118745,
             'externalId' => 2362616710,
@@ -105,6 +105,7 @@ final class callback_test extends \advanced_testcase {
      * Test continue.
      */
     public function test_continue(): void {
+        global $CFG;
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
@@ -128,8 +129,7 @@ final class callback_test extends \advanced_testcase {
             'paymentarea' => 'fee',
             'itemid' => $itemid,
         ];
-        $location = \paygw_mtnafrica\mtn_helper::get_hostname();
-        $location .= '/payment/gateway/mtnafrica/continue.php';
+        $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);
         $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);

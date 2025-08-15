@@ -142,35 +142,7 @@ class mtn_helper {
      */
     private function get_callback_host(): string {
         global $CFG;
-        $http = $this->sandbox ? 'http://' : 'https://';
-        $dom = str_ireplace('http://', '', $CFG->wwwroot);
-        $dom = str_ireplace('https://', '', $dom);
-        if (stripos($dom, 'example.com') !== false) {
-            // Local domain is example domain while testing, so we have to get the info from config.
-            $dom = str_ireplace('www.example.com', self::get_hostname(), $dom);
-            $dom = str_ireplace('/moodle', '', $dom);
-            $http = 'https://';
-        }
-        return $http . $dom;
-    }
-
-    /**
-     * Which hostname are we running, get the info from config file.
-     *
-     * @return string
-     */
-    public static function get_hostname(): string {
-        $lines = file('config.php');
-        $needle = '$CFG->wwwroot';
-        $arr = [$needle, '/moodle', ' ', ';', '=', '"', "'", 'http://', 'https://', PHP_EOL];
-        $result = '127.0.0.1';
-        foreach ($lines as $line) {
-            if (stripos($line, $needle) !== false) {
-                $result = strip_tags(str_ireplace($arr, '', $line));
-            }
-        }
-        // Localhost callbacks are redirected.
-        return str_ireplace(['localhost', '127.0.0.1'], 'test.medical-access.org', $result);
+        return (stripos($CFG->wwwroot, 'example.com') !== false) ? $CFG->behat_wwwroot : $CFG->wwwroot;
     }
 
     /**
@@ -331,12 +303,8 @@ class mtn_helper {
             $result = $response->getBody()->getContents();
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $result = $e->getMessage();
-            // TODO: uncomment for tracing.
-            // mtrace_exception($e);.
         } catch (\Exception $e) {
             $result = $e->getMessage();
-            // TODO: uncomment for tracing.
-            // mtrace_exception($e);.
         } finally {
             $decoded = json_decode($result, true);
             $other = ['verb' => $verb, 'location' => $location];
@@ -346,8 +314,6 @@ class mtn_helper {
                     unset($decolog['access_token']);
                 }
                 $other['result'] = $decolog;
-                // TODO: uncomment for tracing.
-                // mtrace(json_encode($decolog));.
             } else {
                 $resultcode = 500;
                 $resultreason = 'Timeout';
@@ -356,8 +322,6 @@ class mtn_helper {
                     $resultreason = $response->getReasonPhrase();
                 }
                 $other['result'] = $resultcode . ' ' . $resultreason;
-                // TODO: uncomment for tracing.
-                // mtrace($resultcode);.
             }
             $eventargs = ['context' => \context_system::instance(), 'other' => $other];
             // Trigger an event.

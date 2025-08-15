@@ -85,7 +85,6 @@ final class mtn_helper_test extends \advanced_testcase {
         $this->assertEquals('mtnguineaconakry', mtn_helper::target_code('GN'));
         $this->assertEquals('mtnsouthafrica', mtn_helper::target_code('ZA'));
         $this->assertEquals('mtnliberia', mtn_helper::target_code('LR'));
-        $this->assertNotEmpty(mtn_helper::get_hostname());
 
         $this->assertEquals(null, mtn_helper::array_helper('BE', ['FR' => 'France']));
         $this->assertEquals('Belgium', mtn_helper::array_helper('BE', ['BE' => 'Belgium']));

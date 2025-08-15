@@ -37,7 +37,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
  */
 #[CoversClass(clean_up::class)]
 final class clean_up_test extends \advanced_testcase {
-
     /**
      * Test clean up.
      */

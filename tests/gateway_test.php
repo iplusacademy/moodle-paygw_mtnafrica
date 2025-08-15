@@ -91,7 +91,8 @@ final class gateway_test extends \advanced_testcase {
         $data->enabled = true;
         gateway::validate_gateway_form($form, $data, [], $errors);
         $this->assertCount(1, $errors);
-        $this->assertEquals($errors,
+        $this->assertEquals(
+            $errors,
             [
                 'enabled' => 'The payment gateway cannot be enabled because the configuration is incomplete.',
             ]
