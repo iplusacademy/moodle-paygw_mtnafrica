@@ -25,6 +25,7 @@
 
 namespace paygw_mtnafrica;
 
+use paygw_mtnafrica\mtn_helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**

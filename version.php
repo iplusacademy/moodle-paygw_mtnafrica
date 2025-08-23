@@ -27,8 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'paygw_mtnafrica';
 $plugin->dependencies = ['enrol_fee' => ANY_VERSION];
-$plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
+$plugin->release = 'v5.0.2';
+$plugin->version = 2025082300;
+$plugin->requires = 2024100700;
 $plugin->supported = [405, 500];
-$plugin->release = 'v5.0.1';
-$plugin->version = 2025042100;
