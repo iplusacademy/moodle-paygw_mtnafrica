@@ -64,8 +64,8 @@ class behat_paygw_mtnafrica extends behat_base {
         $gateway->enabled = 1;
         \core_payment\helper::save_payment_gateway((object)$gateway);
 
-        $secret = getenv('secret', true) ?: getenv('secret');
-        $secret1 = getenv('secret1', true) ?: getenv('secret1');
+        $secret = getenv('secret', true) ?: 'secret';
+        $secret1 = getenv('secret1', true) ?: 'secret1';
         $config = new \stdClass();
         $config->clientid = 'fakelogin';
         $config->brandname = 'maul';
