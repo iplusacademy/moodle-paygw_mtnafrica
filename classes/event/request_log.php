@@ -64,8 +64,10 @@ class request_log extends \core\event\base {
             if (is_array($value)) {
                 $value = json_encode($value);
             }
+
             $descstring .= "{$key}  : {$value} <br />";
         }
+
         return $descstring;
     }
 }

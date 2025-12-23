@@ -73,6 +73,7 @@ final class callback_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/callback.php';
         $data = [
             'financialTransactionId' => 2026118745,
@@ -110,6 +111,7 @@ final class callback_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $gen = $this->getDataGenerator();
         $course = $gen->create_course();
 
@@ -132,7 +134,7 @@ final class callback_test extends \advanced_testcase {
         ];
         $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);
-        $result = json_decode($response->getBody()->getContents(), true);
+        $result = json_decode((string) $response->getBody()->getContents(), true);
         $this->assertEmpty($result);
     }
 }

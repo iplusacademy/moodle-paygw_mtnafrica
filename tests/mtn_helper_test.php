@@ -109,6 +109,7 @@ final class mtn_helper_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
         $course = $generator->create_course();
@@ -118,7 +119,7 @@ final class mtn_helper_test extends \advanced_testcase {
         $feeid = $feeplugin->add_instance($course, $data);
         $this->setUser($user);
         $mtnhelper = new mtn_helper($this->config);
-        $this->assertEquals(get_class($mtnhelper), 'paygw_mtnafrica\mtn_helper');
+        $this->assertEquals($mtnhelper::class, 'paygw_mtnafrica\mtn_helper');
         $random = random_int(1000000000, 9999999999);
         try {
             $mtnhelper->request_payment($random, 'enrol_fee-fee-13-' . $user->id, 100, 'EUR', '1234567', 'BE');
@@ -130,6 +131,7 @@ final class mtn_helper_test extends \advanced_testcase {
         $token = $result['token'];
         $mtnhelper->transaction_enquiry($xref, $token);
         $mtnhelper->valid_user('123456789');
+
         $result = $mtnhelper->current_user_data();
         $this->assertEquals('123456789', $result['phone']);
         $data = new \stdClass();
@@ -138,6 +140,7 @@ final class mtn_helper_test extends \advanced_testcase {
         $data->transactionid = $xref;
         $data->moneyid = $token;
         $data->timecreated = time();
+
         $DB->insert_record('paygw_mtnafrica', $data);
         $mtnhelper->enrol_user($xref, $feeid, 'enrol_fee', 'fee');
     }
@@ -153,6 +156,7 @@ final class mtn_helper_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $generator = $this->getDataGenerator();
         $account = $generator->get_plugin_generator('core_payment')->create_payment_account(['gateways' => 'mtnafrica']);
         $course = $generator->create_course();
@@ -162,21 +166,25 @@ final class mtn_helper_test extends \advanced_testcase {
         $feeid = $feeplugin->add_instance($course, $data);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
+
         $mtnhelper = new mtn_helper($this->config);
         $userid = $user->id;
-        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-$feeid-$userid", 10, 'EUR', $input, 'UG');
+        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-{$feeid}-{$userid}", 10, 'EUR', $input, 'UG');
         $xref = $result['xreferenceid'];
         $token = $result['token'];
         $result = $mtnhelper->transaction_enquiry($xref, $token);
         $output = strtoupper($output);
         $this->assertEquals($output, $result['status']);
-        if ($result['status'] == 'FAILED') {
+
+        if ($result['status'] === 'FAILED') {
             $this->assertEquals($reason, $result['reason']);
         }
-        if ($result['status'] == 'PENDING' && $input == '46733123454') {
+
+        if ($result['status'] === 'PENDING' && $input === '46733123454') {
             for ($i = 1; $i < 11; $i++) {
                 sleep(16);
                 $result = $mtnhelper->transaction_enquiry($xref, $token);
+
                 if ($result['status'] == 'SUCCESSFUL') {
                     $this->assertEquals('EUR', $result['currency']);
                     break;
@@ -207,17 +215,18 @@ final class mtn_helper_test extends \advanced_testcase {
         if ($this->config['secret'] == '') {
             $this->markTestSkipped('No login credentials');
         }
+
         $phone = '56733123999';
         $user = $this->getDataGenerator()->create_user(['country' => 'UG', 'phone2' => $phone]);
         $this->setUser($user);
         $random = random_int(1000000000, 9999999999);
         $mtnhelper = new mtn_helper($this->config);
-        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-14-$user->id", 11, 'EUR', $phone, 'UG');
+        $result = $mtnhelper->request_payment($random, "enrol_fee-fee-14-{$user->id}", 11, 'EUR', $phone, 'UG');
         $this->assertEquals(202, $result['code']);
         $result = $mtnhelper->transaction_enquiry($result['xreferenceid'], $result['token']);
         $this->assertEquals('SUCCESSFUL', $result['status']);
         $this->assertEquals(11, $result['amount']);
         $this->assertEquals('EUR', $result['currency']);
-        $this->assertEquals("enrol_fee-fee-14-$user->id", $result['payeeNote']);
+        $this->assertEquals("enrol_fee-fee-14-{$user->id}", $result['payeeNote']);
     }
 }

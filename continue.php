@@ -35,4 +35,5 @@ $url = new \moodle_url('/');
 if ($courseid = $DB->get_field('enrol', 'courseid', ['enrol' => $paymentarea, 'id' => $itemid])) {
     $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
 }
+
 redirect($url);

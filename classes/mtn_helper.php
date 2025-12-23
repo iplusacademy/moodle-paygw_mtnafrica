@@ -98,13 +98,13 @@ class mtn_helper {
      */
     public function __construct(array $config, string $country = 'UG') {
         $this->guzzle = new \GuzzleHttp\Client();
-        $this->sandbox = (strtolower($config['environment']) == 'sandbox');
+        $this->sandbox = (strtolower((string) $config['environment']) == 'sandbox');
         $this->clientid = $config['clientid'];
         $this->apikey = $config['apikey'];
         $this->secret = $config['secret'];
         $this->secret1 = $config['secret1'];
         if ($this->sandbox) {
-            $this->clientid = self::gen_uuid4();
+            $this->clientid = $this::gen_uuid4();
             $this->baseurl = 'https://sandbox.momodeveloper.mtn.com/';
             // We try to create a new user.
             $this->testing = (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST));
@@ -118,6 +118,7 @@ class mtn_helper {
             $result = $this->request_post('v1_0/apiuser/' . $this->clientid . '/apikey', [], $headers);
             $this->apikey = self::array_helper('apiKey', $result) ?? $this->apikey;
         }
+
         $this->country = self::array_helper('country', $config) ?? $country;
     }
 
@@ -126,7 +127,7 @@ class mtn_helper {
      *
      * @return string
      */
-    private static function gen_uuid4() {
+    private function gen_uuid4() {
         $magic = '%s%s-%s-%s-%s-%s%s%s';
         $strong = vsprintf($magic, str_split(bin2hex(random_bytes(16)), 4));
         $data = openssl_random_pseudo_bytes(16, $strong);
@@ -142,7 +143,7 @@ class mtn_helper {
      */
     private function get_callback_host(): string {
         global $CFG;
-        return (stripos($CFG->wwwroot, 'example.com') !== false) ? $CFG->behat_wwwroot : $CFG->wwwroot;
+        return (stripos((string) $CFG->wwwroot, 'example.com') !== false) ? $CFG->behat_wwwroot : $CFG->wwwroot;
     }
 
     /**
@@ -155,6 +156,7 @@ class mtn_helper {
             $result = $this->request_post('collection/token/', [], $this->get_basic_auth());
             $this->token = self::array_helper('access_token', $result) ?? '';
         }
+
         return $this->token;
     }
 
@@ -222,7 +224,7 @@ class mtn_helper {
         $currency = $this->sandbox ? 'EUR' : $currency;
         if (in_array($usercountry, $allcountries)) {
             $location = $this->baseurl . 'collection/v1_0/requesttopay';
-            $xref = self::gen_uuid4();
+            $xref = $this::gen_uuid4();
             $headers = [
                 'Authorization' => 'Bearer ' . $this->get_token(),
                 'X-Reference-Id' => $xref,
@@ -243,6 +245,7 @@ class mtn_helper {
             $eventargs = ['context' => \context_system::instance(), 'other' => $other];
             $event = \paygw_mtnafrica\event\request_log::create($eventargs);
             $event->trigger();
+
             return ['code' => $code, 'xreferenceid' => $xref, 'token' => $this->token];
         }
         throw new \moodle_exception(get_string('invalidcountrycode', 'core_error', $usercountry));
@@ -263,6 +266,7 @@ class mtn_helper {
             'X-Target-Environment' => $this->sandbox ? 'sandbox' : self::target_code($this->country),
             'Ocp-Apim-Subscription-Key' => $this->secret1,
         ];
+
         return $this->request_post($location, [], $headers, 'GET');
     }
 
@@ -273,8 +277,9 @@ class mtn_helper {
      * @return bool True is valid user.
      */
     public function valid_user(string $phone): bool {
-        $location = $this->baseurl . "collection/v1_0/accountholder/msisdn/$phone/basicuserinfo";
+        $location = $this->baseurl . "collection/v1_0/accountholder/msisdn/{$phone}/basicuserinfo";
         $response = $this->guzzle->request('GET', $location, ['headers' => $this->get_advanced_auth()]);
+
         return $response->getStatusCode() == 200;
     }
 
@@ -292,27 +297,28 @@ class mtn_helper {
         array $data,
         array $headers = [],
         string $verb = 'POST'
-    ): ?array {
+    ): array {
 
-        $decoded = $result = $resultcode = '';
+        $decoded = '';
+        $result = '';
+        $resultcode = '';
         $response = null;
         $location = $this->baseurl . $location;
         $headers = array_merge(['Content-Type' => 'application/json'], $headers);
         try {
             $response = $this->guzzle->request($verb, $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $result = $e->getMessage();
-        } catch (\Exception $e) {
-            $result = $e->getMessage();
+        } catch (\GuzzleHttp\Exception\ClientException | \Exception $exception) {
+            $result = $exception->getMessage();
         } finally {
-            $decoded = json_decode($result, true);
+            $decoded = json_decode((string) $result, true);
             $other = ['verb' => $verb, 'location' => $location];
             $decolog = $decoded;
             if (is_array($decolog)) {
                 if (array_key_exists('access_token', $decolog)) {
                     unset($decolog['access_token']);
                 }
+
                 $other['result'] = $decolog;
             } else {
                 $resultcode = 500;
@@ -321,12 +327,15 @@ class mtn_helper {
                     $resultcode = $response->getStatusCode();
                     $resultreason = $response->getReasonPhrase();
                 }
+
                 $other['result'] = $resultcode . ' ' . $resultreason;
             }
+
             $eventargs = ['context' => \context_system::instance(), 'other' => $other];
             // Trigger an event.
             \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
         }
+
         return $decoded ?? [];
     }
 
@@ -365,6 +374,7 @@ class mtn_helper {
                     if ($status == 'FAILED') {
                         $DB->delete_record('paygw_mtnafrica', $cond);
                     }
+
                     if ($status == 'SUCCESSFUL') {
                         $payable = helper::get_payable($component, $area, $itemid);
                         $payid = $payable->get_account_id();
@@ -377,7 +387,7 @@ class mtn_helper {
                         $payer = self::array_helper('payeeNote', $result);
                         if ($currency == $rcurrency && $amount == $ramount) {
                             // We have a succesfull transaction.
-                            $payer = explode('-', $payer);
+                            $payer = explode('-', (string) $payer);
                             if ($payer[0] == $component && $payer[1] == $area && intval($payer[3]) == $userid) {
                                 $saved = helper::save_payment(
                                     $payid,
@@ -402,12 +412,13 @@ class mtn_helper {
                 }
             }
         }
+
         return $status;
     }
 
     /**
      * Transaction code
-     * @param int $code
+     * @param int $code Code
      * @return string
      */
     public static function ta_code(int $code): string {
@@ -454,7 +465,7 @@ class mtn_helper {
         // Cleans key and array to avoid XSS and other issues.
         $safekey = clean_param($key, PARAM_TEXT);
         $safearr = clean_param_array($arr, PARAM_TEXT, true);
-        return (isset($safearr[$safekey])) ? $safearr[$safekey] : null;
+        return $safearr[$safekey] ?? null;
     }
 
     /**
@@ -468,9 +479,9 @@ class mtn_helper {
         $user = \core_user::get_user($USER->id, 'id, phone1, phone2, country');
         if ($user) {
             $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
-            $phone = preg_replace("/[^0-9]/", '', $phone);
+            $phone = preg_replace("/[^0-9]/", '', (string) $phone);
             if (strlen($phone) > 5) {
-                $arr = ['id' => $user->id, 'country' => strtoupper($user->country), 'phone' => $phone];
+                $arr = ['id' => $user->id, 'country' => strtoupper((string) $user->country), 'phone' => $phone];
             }
         }
         return $arr;

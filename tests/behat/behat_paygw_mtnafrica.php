@@ -41,8 +41,8 @@ use Behat\Gherkin\Node\TableNode;
 class behat_paygw_mtnafrica extends behat_base {
     /**
      * Get the secrets from the environment.
-     * @Then I configure mtn
      */
+    #[\Behat\Step\Then('I configure mtn')]
     public function i_configure_mtn(): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/enrol/locallib.php');
@@ -57,12 +57,13 @@ class behat_paygw_mtnafrica extends behat_base {
         $account->idnumber = 'testid';
         $account->gateways = 'mtnafrica';
         $account->enabled = 1;
-        $account = \core_payment\helper::save_payment_account((object)$account);
+        $account = \core_payment\helper::save_payment_account($account);
+
         $gateway = new \stdClass();
         $gateway->accountid = $account->get('id');
         $gateway->gateway = 'mtnafrica';
         $gateway->enabled = 1;
-        \core_payment\helper::save_payment_gateway((object)$gateway);
+        \core_payment\helper::save_payment_gateway($gateway);
 
         $secret = getenv('secret', true) ?: 'secret';
         $secret1 = getenv('secret1', true) ?: 'secret1';
@@ -74,6 +75,7 @@ class behat_paygw_mtnafrica extends behat_base {
         $config->secret = $secret;
         $config->secret1 = $secret1;
         $config->country = 'UG';
+
         $DB->set_field('payment_gateways', 'config', json_encode($config), []);
     }
 }

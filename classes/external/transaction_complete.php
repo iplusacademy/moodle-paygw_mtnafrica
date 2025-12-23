@@ -64,7 +64,6 @@ class transaction_complete extends external_api {
      * @param string $paymentarea
      * @param int $itemid An internal identifier that is used by the component
      * @param string $xreferenceid MTN Africa order ID
-     * @return array
      */
     public static function execute(string $component, string $paymentarea, int $itemid, string $xreferenceid): array {
         global $USER;

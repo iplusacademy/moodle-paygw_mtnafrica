@@ -84,6 +84,7 @@ final class provider_test extends provider_testcase {
         $data->timecreated = time();
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
+
         $DB->insert_record('paygw_mtnafrica', $data);
 
         $paygen = $generator->get_plugin_generator('core_payment');
@@ -108,6 +109,7 @@ final class provider_test extends provider_testcase {
         $data->timecreated = time();
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
+
         $pid = $DB->insert_record('paygw_mtnafrica', $data);
         $data->id = $pid;
         $this->payrec = $data;
@@ -247,6 +249,7 @@ final class provider_test extends provider_testcase {
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
         $data->timecompleted = time();
+
         $DB->insert_record('paygw_mtnafrica', $data);
 
         $user2 = $generator->create_user();
@@ -262,6 +265,7 @@ final class provider_test extends provider_testcase {
         $data->component = 'mtnafrica';
         $data->paymentarea = 'fee';
         $data->timecompleted = time();
+
         $DB->insert_record('paygw_mtnafrica', $data);
         return $user;
     }

@@ -46,6 +46,7 @@ final class behat_test extends \advanced_testcase {
         if ($CFG->version < 2023042400) {
             require_once($CFG->dirroot . '/local/aws/sdk/aws-autoloader.php');
         }
+
         require_once($CFG->dirroot . '/payment/gateway/mtnafrica/tests/behat/behat_paygw_mtnafrica.php');
         $this->resetAfterTest(true);
     }

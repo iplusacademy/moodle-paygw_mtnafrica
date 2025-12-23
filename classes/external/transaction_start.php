@@ -62,7 +62,6 @@ class transaction_start extends external_api {
      * @param string $component Name of the component that the itemid belongs to
      * @param string $paymentarea
      * @param int $itemid An internal identifier that is used by the component
-     * @return array
      */
     public static function execute(string $component, string $paymentarea, int $itemid): array {
         global $DB, $USER;
@@ -88,12 +87,13 @@ class transaction_start extends external_api {
         $cost = helper::get_rounded_cost($amount, $currency, $surcharge);
         $reference = implode('-', [$component, $paymentarea, $itemid, $userid]);
         $code = 409;
-        while ($code == 409) {
+        while ($code === 409) {
             $random = random_int(1000000000, 9999999999);
             $result = $helper->request_payment($random, $reference, $cost, $currency, $user['phone'], $user['country']);
             $code = (int)mtn_helper::array_helper('code', $result);
         }
-        if ($code && $code == 202) {
+
+        if ($code && $code === 202) {
             $cond = ['paymentid' => $itemid, 'userid' => $userid];
             $DB->delete_records('paygw_mtnafrica', $cond);
             $transactionid = mtn_helper::array_helper('xreferenceid', $result) ?? '0';
@@ -107,6 +107,7 @@ class transaction_start extends external_api {
             $data->timecreated = time();
             $DB->insert_record('paygw_mtnafrica', $data);
         }
+
         return ['transactionid' => $transactionid, 'reference' => $reference, 'message' => mtn_helper::ta_code((int)$code)];
     }
 

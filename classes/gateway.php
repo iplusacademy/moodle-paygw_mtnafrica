@@ -36,8 +36,6 @@ namespace paygw_mtnafrica;
 class gateway extends \core_payment\gateway {
     /**
      * Country - Currencies supported
-     *
-     * @return array
      */
     public static function get_country_currencies(): array {
         return [
@@ -61,8 +59,6 @@ class gateway extends \core_payment\gateway {
 
     /**
      * Currencies supported
-     *
-     * @return array
      */
     public static function get_supported_currencies(): array {
         return ['CDF', 'EUR', 'GHS', 'GNF', 'LRD', 'RWF', 'UGX', 'XAF', 'XOF', 'ZAR', 'ZMW'];
@@ -70,8 +66,6 @@ class gateway extends \core_payment\gateway {
 
     /**
      * Countries supported
-     *
-     * @return array
      */
     public static function get_countries(): array {
         return ['BJ', 'CM', 'TD', 'CG', 'CD', 'GA', 'GH', 'CI', 'LR', 'NE', 'RW', 'ZA', 'UG', 'ZM'];
@@ -79,8 +73,6 @@ class gateway extends \core_payment\gateway {
 
     /**
      * Countries supported
-     *
-     * @return array
      */
     private static function get_supported_countries(): array {
         $countries = self::get_countries();
@@ -89,6 +81,7 @@ class gateway extends \core_payment\gateway {
         foreach ($countries as $country) {
             $return[$country] = $strs->$country;
         }
+
         return $return;
     }
 
