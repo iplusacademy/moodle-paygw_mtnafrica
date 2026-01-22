@@ -25,7 +25,7 @@ import * as Repository from './repository';
 import Ajax from 'core/ajax';
 import Config from 'core/config';
 import Log from 'core/log';
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
@@ -36,7 +36,7 @@ import {get_string as getString} from 'core/str';
  * @returns {Promise<Modal>}
  */
 const showModalWithPlaceholder = async() => {
-    const modal = await ModalFactory.create({
+    const modal = await Modal.create({
         body: await Templates.render('paygw_mtnafrica/placeholder', {})
     });
     modal.show();
