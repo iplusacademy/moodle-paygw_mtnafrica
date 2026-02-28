@@ -25,10 +25,10 @@
 
 namespace paygw_mtnafrica;
 
-use curl;
-use stdClass;
+use context_system;
 use core_payment\helper;
 use core_text;
+use stdClass;
 
 /**
  * Contains helper class to work with MTN Africa REST API.
@@ -242,7 +242,7 @@ class mtn_helper {
             $response = $this->guzzle->request('POST', $location, ['headers' => $headers, 'json' => $data]);
             $code = $response->getStatusCode();
             $other = array_merge(['verb' => 'Post', 'location' => $location, 'answer' => $code], $data);
-            $eventargs = ['context' => \context_system::instance(), 'other' => $other];
+            $eventargs = ['context' => context_system::instance(), 'other' => $other];
             $event = \paygw_mtnafrica\event\request_log::create($eventargs);
             $event->trigger();
 
@@ -331,7 +331,7 @@ class mtn_helper {
                 $other['result'] = $resultcode . ' ' . $resultreason;
             }
 
-            $eventargs = ['context' => \context_system::instance(), 'other' => $other];
+            $eventargs = ['context' => context_system::instance(), 'other' => $other];
             // Trigger an event.
             \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();
         }

@@ -25,6 +25,7 @@
 
 namespace paygw_mtnafrica;
 
+use advanced_testcase;
 use paygw_mtnafrica\mtn_helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -37,7 +38,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[CoversClass(mtn_helper::class)]
-final class callback_test extends \advanced_testcase {
+final class callback_test extends advanced_testcase {
     /** @var \core_payment\account account */
     private $account;
 
@@ -74,7 +75,7 @@ final class callback_test extends \advanced_testcase {
             $this->markTestSkipped('No login credentials');
         }
 
-        $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/callback.php';
+        $url = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/callback.php';
         $data = [
             'financialTransactionId' => 2026118745,
             'externalId' => 2362616710,
@@ -87,7 +88,7 @@ final class callback_test extends \advanced_testcase {
         ];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_PROXY, $location);
+        curl_setopt($curl, CURLOPT_PROXY, $url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($curl, CURLOPT_VERBOSE, false);
@@ -97,7 +98,7 @@ final class callback_test extends \advanced_testcase {
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($curl, CURLOPT_URL, $location);
+        curl_setopt($curl, CURLOPT_URL, $url);
         $result = curl_exec($curl);
         $this->assertStringNotContainsString('MAUL', $result);
         @curl_close($curl);
