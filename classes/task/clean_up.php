@@ -43,7 +43,7 @@ class clean_up extends \core\task\scheduled_task {
     /**
      * Run task for cleaning up payments.
      */
-    public function execute() {
+    public function execute(): void {
         global $DB;
         $DB->delete_records_select('paygw_mtnafrica', 'timecompleted IS NULL', []);
     }

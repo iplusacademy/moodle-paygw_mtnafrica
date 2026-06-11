@@ -58,9 +58,10 @@ class provider implements core_userlist_provider, metadata_provider, paygw_provi
 
     #[\Override]
     public static function get_contexts_for_userid(int $userid): contextlist {
-        $sql = "SELECT id
-                  FROM {context}
-                 WHERE instanceid = :userid AND contextlevel = :contextlevel";
+        $sql = "SELECT ctx.id
+                  FROM {context} ctx
+                  JOIN {paygw_mtnafrica} m ON m.userid = ctx.instanceid
+                  WHERE ctx.instanceid = :userid AND ctx.contextlevel = :contextlevel";
         $contextlist = new contextlist();
         $contextlist->set_component('paygw_mtnafrica');
         $contextlist->add_from_sql($sql, ['userid' => $userid, 'contextlevel' => CONTEXT_USER]);

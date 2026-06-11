@@ -135,7 +135,7 @@ final class callback_test extends advanced_testcase {
         ];
         $location = $CFG->behat_wwwroot . '/payment/gateway/mtnafrica/continue.php';
         $response = $client->request('POST', $location, ['form_params' => $data]);
-        $result = json_decode((string) $response->getBody()->getContents(), true);
+        $result = json_decode($response->getBody()->getContents(), true);
         $this->assertEmpty($result);
     }
 }

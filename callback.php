@@ -60,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                     'other' => [
                         'message' => $rmessage,
                         'id' => $transactionid,
-                        'mtn_money_id' => $rtransid,
                     ],
                 ];
                 \paygw_mtnafrica\event\request_log::create($eventargs)->trigger();

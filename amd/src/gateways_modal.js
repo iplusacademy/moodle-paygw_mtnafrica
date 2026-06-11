@@ -59,7 +59,6 @@ export const process = (component, paymentArea, itemId, description) => {
     ])
     .then(([modal, mtnConfig]) => {
         modal.setTitle(getString('pluginname', 'paygw_mtnafrica'));
-        console.log(description);  // eslint-disable-line
         const phoneNumber = modal.getRoot().find('#mtn-phone');
         phoneNumber.append('<h4>' + mtnConfig.phone + '</h4>');
         const userCountry = modal.getRoot().find('#mtn-country');
@@ -68,7 +67,6 @@ export const process = (component, paymentArea, itemId, description) => {
         extraDiv.append('<h4>' + mtnConfig.cost + ' ' + mtnConfig.currency + '</h4>');
         modal.getRoot().on(ModalEvents.hidden, () => {
             // Destroy when hidden.
-            console.log('Destroy modal');  // eslint-disable-line
             modal.destroy();
         });
         return Promise.all([modal, mtnConfig]);
@@ -108,8 +106,6 @@ export const process = (component, paymentArea, itemId, description) => {
                     modal.destroy();
                 });
                 payButton.attr('disabled',  '');
-                console.log('mtn Africa payment process started');  // eslint-disable-line
-                console.log('Reference id: ' + transId);  // eslint-disable-line
                 var arrayints = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
                 var interval = mtnConfig.timeout;
                 var cont = true;
@@ -130,7 +126,6 @@ export const process = (component, paymentArea, itemId, description) => {
                                     },
                                     done: function(mtnPing) {
                                         modal.setFooter(el + '/10 ' + mtnPing.message);
-                                        console.log(el + '/10 ' + mtnPing.message);  // eslint-disable-line
                                         var spinnerDiv = modal.getRoot().find('#mtn-spinner');
                                         if (mtnPing.success) {
                                             if (mtnPing.message == 'SUCCESSFUL') {
@@ -157,7 +152,6 @@ export const process = (component, paymentArea, itemId, description) => {
                                         }
                                     },
                                     fail: function(e) {
-                                        console.log(getString('failed', 'paygw_mtnafrica'));  // eslint-disable-line
                                         Log.debug(e);
                                     }
                                 }]);
@@ -171,7 +165,6 @@ export const process = (component, paymentArea, itemId, description) => {
                 return new Promise(() => null);
             }).catch(function() {
                 modal.setBody(getString('unable', 'paygw_mtnafrica'));
-                console.log('Unable to connect to MTN');  // eslint-disable-line
             });
         });
         return new Promise(() => null);

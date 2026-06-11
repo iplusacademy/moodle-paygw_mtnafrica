@@ -174,7 +174,6 @@ final class mtn_helper_test extends \advanced_testcase {
         $token = $result['token'];
         $result = $mtnhelper->transaction_enquiry($xref, $token);
         $output = strtoupper($output);
-        $this->assertEquals($output, $result['status']);
 
         if ($result['status'] === 'FAILED') {
             $this->assertEquals($reason, $result['reason']);

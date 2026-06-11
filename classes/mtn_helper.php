@@ -60,11 +60,6 @@ class mtn_helper {
     public $apikey;
 
     /**
-     * @var string MTN Africa Apikey
-     */
-    private $secret;
-
-    /**
      * @var string MTN Africa Apikey2
      */
     private $secret1;
@@ -85,9 +80,9 @@ class mtn_helper {
     public $testing = false;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var \core\http_client httpclient
      */
-    private $guzzle;
+    private $httpclient;
 
 
     /**
@@ -97,11 +92,10 @@ class mtn_helper {
      * @param string $country MTN Africa location.
      */
     public function __construct(array $config, string $country = 'UG') {
-        $this->guzzle = new \GuzzleHttp\Client();
-        $this->sandbox = (strtolower((string) $config['environment']) == 'sandbox');
+        $this->httpclient = new \core\http_client();
+        $this->sandbox = (strtolower((string) $config['environment']) === 'sandbox');
         $this->clientid = $config['clientid'];
         $this->apikey = $config['apikey'];
-        $this->secret = $config['secret'];
         $this->secret1 = $config['secret1'];
         if ($this->sandbox) {
             $this->clientid = $this::gen_uuid4();
@@ -124,10 +118,8 @@ class mtn_helper {
 
     /**
      * Generate UUID version 4
-     *
-     * @return string
      */
-    private function gen_uuid4() {
+    private function gen_uuid4(): string {
         $magic = '%s%s-%s-%s-%s-%s%s%s';
         $strong = vsprintf($magic, str_split(bin2hex(random_bytes(16)), 4));
         $data = openssl_random_pseudo_bytes(16, $strong);
@@ -138,8 +130,6 @@ class mtn_helper {
 
     /**
      * Which host should be used for callback.
-     *
-     * @return string
      */
     private function get_callback_host(): string {
         global $CFG;
@@ -164,7 +154,6 @@ class mtn_helper {
      * Add 'X-XSS-Protection'
      *
      * @param array $arr
-     * @return array
      */
     private function add_xxx_protection(array $arr): array {
         return $this->sandbox ? array_merge($arr, ['X-XSS-Protection' => 0]) : $arr;
@@ -172,8 +161,6 @@ class mtn_helper {
 
     /**
      * Basic Authorization.
-     *
-     * @return array
      */
     private function get_basic_auth(): array {
         return $this->add_xxx_protection([
@@ -184,8 +171,6 @@ class mtn_helper {
 
     /**
      * Advanced Authorization.
-     *
-     * @return array
      */
     private function get_advanced_auth(): array {
         $token = $this->get_token();
@@ -239,7 +224,7 @@ class mtn_helper {
                 'payerMessage' => substr(get_string('thanks', 'paygw_mtnafrica'), 0, 30),
                 'payeeNote' => $reference,
             ];
-            $response = $this->guzzle->request('POST', $location, ['headers' => $headers, 'json' => $data]);
+            $response = $this->httpclient->request('POST', $location, ['headers' => $headers, 'json' => $data]);
             $code = $response->getStatusCode();
             $other = array_merge(['verb' => 'Post', 'location' => $location, 'answer' => $code], $data);
             $eventargs = ['context' => context_system::instance(), 'other' => $other];
@@ -248,6 +233,7 @@ class mtn_helper {
 
             return ['code' => $code, 'xreferenceid' => $xref, 'token' => $this->token];
         }
+
         throw new \moodle_exception(get_string('invalidcountrycode', 'core_error', $usercountry));
     }
 
@@ -278,7 +264,7 @@ class mtn_helper {
      */
     public function valid_user(string $phone): bool {
         $location = $this->baseurl . "collection/v1_0/accountholder/msisdn/{$phone}/basicuserinfo";
-        $response = $this->guzzle->request('GET', $location, ['headers' => $this->get_advanced_auth()]);
+        $response = $this->httpclient->request('GET', $location, ['headers' => $this->get_advanced_auth()]);
 
         return $response->getStatusCode() == 200;
     }
@@ -306,9 +292,9 @@ class mtn_helper {
         $location = $this->baseurl . $location;
         $headers = array_merge(['Content-Type' => 'application/json'], $headers);
         try {
-            $response = $this->guzzle->request($verb, $location, ['headers' => $headers, 'json' => $data]);
+            $response = $this->httpclient->request($verb, $location, ['headers' => $headers, 'json' => $data]);
             $result = $response->getBody()->getContents();
-        } catch (\GuzzleHttp\Exception\ClientException | \Exception $exception) {
+        } catch (\httpclientHttp\Exception\ClientException | \Exception $exception) {
             $result = $exception->getMessage();
         } finally {
             $decoded = json_decode((string) $result, true);
@@ -346,7 +332,6 @@ class mtn_helper {
      * @param int $itemid
      * @param string $component Name of the component that the itemid belongs to
      * @param string $area The payment area
-     * @return string
      */
     public function enrol_user(string $transactionid, int $itemid, string $component, string $area): string {
         global $DB;
@@ -404,8 +389,8 @@ class mtn_helper {
                                 $DB->set_field('paygw_mtnafrica', 'moneyid', $moneyid, $cond);
                             }
                         } else {
-                            // Fraud?
-                            $DB->set_field('paygw_mtnafrica', 'area', 'FRAUD');
+                             // Amount/currency mismatch - do not deliver.
+                            $DB->set_field('paygw_mtnafrica', 'area', 'FRAUD', $cond);
                             $status = 'FAILED';
                         }
                     }
@@ -419,7 +404,6 @@ class mtn_helper {
     /**
      * Transaction code
      * @param int $code Code
-     * @return string
      */
     public static function ta_code(int $code): string {
         $returns = [
@@ -470,8 +454,6 @@ class mtn_helper {
 
     /**
      * User data helper.
-     *
-     * @return array
      */
     public function current_user_data(): array {
         global $USER;
@@ -480,10 +462,11 @@ class mtn_helper {
         if ($user) {
             $phone = $user->phone2 == '' ? $user->phone1 : $user->phone2;
             $phone = preg_replace("/[^0-9]/", '', (string) $phone);
-            if (strlen($phone) > 5) {
+            if (strlen((string) $phone) > 5) {
                 $arr = ['id' => $user->id, 'country' => strtoupper((string) $user->country), 'phone' => $phone];
             }
         }
+
         return $arr;
     }
 }
