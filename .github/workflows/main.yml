@@ -98,20 +98,6 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci --ansi mustache
 
-      - name: phpunit
-        if: ${{ always() }}
-        env:
-            login: ${{ secrets.login }}
-            secret: ${{ secrets.secret }}
-            secret1: ${{ secrets.secret1 }}
-        run: moodle-plugin-ci --ansi phpunit --coverage-text --coverage-clover
-
-      - name: coveralls
-        if: ${{ always() }}
-        run: moodle-plugin-ci coveralls-upload
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: chrome
         if: ${{ always() }}
         id: chrome
@@ -129,3 +115,17 @@ jobs:
           path: ${{ github.workspace }}/moodledata/behat_dump
           retention-days: 7
           if-no-files-found: ignore
+
+      - name: phpunit
+        if: ${{ always() }}
+        env:
+            login: ${{ secrets.login }}
+            secret: ${{ secrets.secret }}
+            secret1: ${{ secrets.secret1 }}
+        run: moodle-plugin-ci --ansi phpunit --coverage-text --coverage-clover
+
+      - name: coveralls
+        if: ${{ always() }}
+        run: moodle-plugin-ci coveralls-upload
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
