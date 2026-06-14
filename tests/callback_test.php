@@ -138,9 +138,9 @@ final class callback_test extends advanced_testcase {
             $response = $client->request('POST', $location, ['form_params' => $data]);
             $result = json_decode($response->getBody()->getContents(), true);
             $this->assertEmpty($result);
-        } catch (Exception $exception) {
+        } catch (\GuzzleHttp\Exception\ConnectException) {
             // We are on GitHub?
-            $this->assertEmpty($result);
+            $this->assertNotEmpty($client);
         }
     }
 }
