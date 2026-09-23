@@ -101,7 +101,6 @@ final class callback_test extends advanced_testcase {
         curl_setopt($curl, CURLOPT_URL, $url);
         $result = curl_exec($curl);
         $this->assertStringNotContainsString('MAUL', $result);
-        @curl_close($curl);
     }
 
     /**
