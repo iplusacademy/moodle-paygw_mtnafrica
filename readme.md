@@ -50,7 +50,7 @@ git clone https://github.com/iplusacademy/moodle-paygw_mtnafrica.git payment/gat
 
 ## Requirements
 
-- This plugin requires Moodle 4.2.0+
+- This plugin requires Moodle 5.1.0+
 
 ## Warning
 
